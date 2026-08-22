@@ -1,5 +1,7 @@
 #include <windows.h>
 #include <cstdint>
+#include <string>
+#include <unordered_map>
 #include "minhook/include/MinHook.h"
 #include "subtitles_data.h"
 
@@ -62,7 +64,7 @@ void LoadRealXInput() {
 extern "C" {
     DWORD WINAPI XInputGetState(DWORD dwUserIndex, void* pState) {
         if (!orig_XInputGetState) LoadRealXInput();
-        return orig_XInputGetState ? orig_XInputGetState(dwUserIndex, pState) : 1167; // ERROR_DEVICE_NOT_CONNECTED
+        return orig_XInputGetState ? orig_XInputGetState(dwUserIndex, pState) : 1167;
     }
     DWORD WINAPI XInputSetState(DWORD dwUserIndex, void* pVibration) {
         if (!orig_XInputSetState) LoadRealXInput();
@@ -106,68 +108,91 @@ extern "C" {
     }
 }
 
-// --- UE4 AltDataSet Structure (0x50 bytes) ---
-#pragma pack(push, 1)
-struct AltDataSet {
-    uint8_t dummy[0x18];       // 0x00..0x17
-    uint8_t State;             // 0x18 (2 = ELS_Ready)
-    uint8_t pad19[7];          // 0x19..0x1F
-    const wchar_t* Data;       // 0x20 (pointer to raw wide buffer: key\0val\0...)
-    int32_t DataLength;        // 0x28 (character count of Data buffer)
-    uint8_t dummyRest[0x50 - 0x2C];
+// --- UE4 String Structure ---
+struct UE4String {
+    wchar_t* Data;
+    int32_t ArrayNum;
+    int32_t ArrayMax;
 };
-#pragma pack(pop)
 
-static AltDataSet g_MasterDataset;
+// --- UE4 Allocator Functions ---
+typedef void* (*t_FMemoryMalloc)(size_t Count, uint32_t Alignment);
+typedef void (*t_FMemoryFree)(void* Original);
 
-typedef void* (__fastcall *t_FindAltDataSetByLayerName)(void* thisPtr, int unk, void* LayerName);
-static t_FindAltDataSetByLayerName orig_FindAltDataSet = NULL;
+static t_FMemoryMalloc fnFMemoryMalloc = NULL;
+static t_FMemoryFree fnFMemoryFree = NULL;
 
-void* __fastcall hook_FindAltDataSetByLayerName(void* thisPtr, int unk, void* LayerName) {
-    void* result = NULL;
-    if (orig_FindAltDataSet) {
-        result = orig_FindAltDataSet(thisPtr, unk, LayerName);
+static std::unordered_map<std::wstring, std::wstring> g_SubtitleMap;
+
+void InitSubtitleMap() {
+    if (!g_SubtitleMap.empty()) return;
+    const wchar_t* p = (const wchar_t*)g_MasterSubtitleData;
+    const wchar_t* end = (const wchar_t*)(g_MasterSubtitleData + sizeof(g_MasterSubtitleData));
+    while (p < end && *p != L'\0') {
+        std::wstring key = p;
+        p += key.length() + 1;
+        if (p >= end) break;
+        std::wstring val = p;
+        p += val.length() + 1;
+        g_SubtitleMap[key] = val;
     }
-    if (result != NULL) {
-        AltDataSet* ds = (AltDataSet*)result;
-        ds->State = 2; // ELS_Ready
-        ds->Data = (const wchar_t*)g_MasterSubtitleData;
-        ds->DataLength = (int32_t)g_MasterSubtitleCharCount;
-        return result;
+}
+
+void SetUE4String(UE4String* str, const wchar_t* src) {
+    if (!str || !src || !fnFMemoryMalloc || !fnFMemoryFree) return;
+    int32_t len = (int32_t)wcslen(src) + 1;
+    if (str->Data) {
+        fnFMemoryFree(str->Data);
+        str->Data = NULL;
     }
-    // Return static master dataset containing all 10,475 subtitles
-    memset(&g_MasterDataset, 0, sizeof(g_MasterDataset));
-    g_MasterDataset.State = 2; // ELS_Ready
-    g_MasterDataset.Data = (const wchar_t*)g_MasterSubtitleData;
-    g_MasterDataset.DataLength = (int32_t)g_MasterSubtitleCharCount;
-    return &g_MasterDataset;
+    size_t bytes = (size_t)len * sizeof(wchar_t);
+    str->Data = (wchar_t*)fnFMemoryMalloc(bytes, 0);
+    if (str->Data) {
+        memcpy(str->Data, src, bytes);
+        str->ArrayNum = len;
+        str->ArrayMax = len;
+    } else {
+        str->ArrayNum = 0;
+        str->ArrayMax = 0;
+    }
+}
+
+typedef int64_t (__fastcall *t_GetSubtitleText)(void* thisPtr, UE4String* InCue, UE4String* OutSubtitleText);
+static t_GetSubtitleText orig_GetSubtitleText = NULL;
+
+int64_t __fastcall hook_GetSubtitleText(void* thisPtr, UE4String* InCue, UE4String* OutSubtitleText) {
+    int64_t res = 0;
+    if (orig_GetSubtitleText) {
+        res = orig_GetSubtitleText(thisPtr, InCue, OutSubtitleText);
+    }
+    if (InCue && InCue->Data && InCue->ArrayNum > 1) {
+        std::wstring cue(InCue->Data);
+        auto it = g_SubtitleMap.find(cue);
+        if (it != g_SubtitleMap.end()) {
+            SetUE4String(OutSubtitleText, it->second.c_str());
+            return 0; // Success!
+        }
+    }
+    return res;
 }
 
 DWORD WINAPI SubtitleModThread(LPVOID lpParam) {
     HMODULE hMain = GetModuleHandleA(NULL);
     if (!hMain) return 0;
+    uintptr_t base = (uintptr_t)hMain;
 
-    uintptr_t baseAddr = (uintptr_t)hMain;
+    InitSubtitleMap();
 
-    // 1. In-memory patch at VA 0x14071023d (RVA 0x71023d):
-    // Force always proceeding to AltDataSet lookup (bypass rigid cue layer validator early exit)
-    uintptr_t patch1_va = baseAddr + 0x71023d;
-    uintptr_t target_lookup_va = baseAddr + 0x7103b8;
-    int32_t disp1 = (int32_t)(target_lookup_va - (patch1_va + 5));
+    // UE4 Allocators:
+    // FMemory::Malloc at RVA 0xa66980
+    // FMemory::Free at RVA 0xa668d0
+    fnFMemoryMalloc = (t_FMemoryMalloc)(base + 0xa66980);
+    fnFMemoryFree = (t_FMemoryFree)(base + 0xa668d0);
 
-    DWORD oldProt;
-    if (VirtualProtect((LPVOID)patch1_va, 6, PAGE_EXECUTE_READWRITE, &oldProt)) {
-        unsigned char* p = (unsigned char*)patch1_va;
-        p[0] = 0xE9; // jmp rel32
-        *(int32_t*)(p + 1) = disp1;
-        p[5] = 0x90; // nop
-        VirtualProtect((LPVOID)patch1_va, 6, oldProt, &oldProt);
-    }
-
-    // 2. Initialize MinHook and hook FindAltDataSetByLayerName at RVA 0x7188a0
+    // Hook GetSubtitleText at RVA 0x70fd40
     if (MH_Initialize() == MH_OK) {
-        uintptr_t targetFn = baseAddr + 0x7188a0;
-        MH_CreateHook((LPVOID)targetFn, (LPVOID)&hook_FindAltDataSetByLayerName, (LPVOID*)&orig_FindAltDataSet);
+        uintptr_t targetFn = base + 0x70fd40;
+        MH_CreateHook((LPVOID)targetFn, (LPVOID)&hook_GetSubtitleText, (LPVOID*)&orig_GetSubtitleText);
         MH_EnableHook((LPVOID)targetFn);
     }
 
