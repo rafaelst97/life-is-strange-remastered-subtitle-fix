@@ -13,6 +13,10 @@ typedef void (WINAPI *t_XInputEnable)(BOOL enable);
 typedef DWORD (WINAPI *t_XInputGetDSoundAudioDeviceGuids)(DWORD dwUserIndex, GUID* pDSoundRenderGuid, GUID* pDSoundCaptureGuid);
 typedef DWORD (WINAPI *t_XInputGetBatteryInformation)(DWORD dwUserIndex, BYTE devType, void* pBatteryInformation);
 typedef DWORD (WINAPI *t_XInputGetKeystroke)(DWORD dwUserIndex, DWORD dwReserved, void* pKeystroke);
+typedef DWORD (WINAPI *t_XInputGetStateEx)(DWORD dwUserIndex, void* pState);
+typedef DWORD (WINAPI *t_XInputWaitForGuideButton)(DWORD dwUserIndex, DWORD dwFlag, void* pUnk);
+typedef DWORD (WINAPI *t_XInputCancelGuideButtonWait)(DWORD dwUserIndex);
+typedef DWORD (WINAPI *t_XInputPowerOffController)(DWORD dwUserIndex);
 
 static t_XInputGetState orig_XInputGetState = NULL;
 static t_XInputSetState orig_XInputSetState = NULL;
@@ -21,6 +25,10 @@ static t_XInputEnable orig_XInputEnable = NULL;
 static t_XInputGetDSoundAudioDeviceGuids orig_XInputGetDSoundAudioDeviceGuids = NULL;
 static t_XInputGetBatteryInformation orig_XInputGetBatteryInformation = NULL;
 static t_XInputGetKeystroke orig_XInputGetKeystroke = NULL;
+static t_XInputGetStateEx orig_XInputGetStateEx = NULL;
+static t_XInputWaitForGuideButton orig_XInputWaitForGuideButton = NULL;
+static t_XInputCancelGuideButtonWait orig_XInputCancelGuideButtonWait = NULL;
+static t_XInputPowerOffController orig_XInputPowerOffController = NULL;
 
 static HMODULE hRealXInput = NULL;
 
@@ -36,13 +44,17 @@ void LoadRealXInput() {
             hRealXInput = LoadLibraryA(sysPath);
         }
         if (hRealXInput) {
-            orig_XInputGetState = (t_XInputGetState)GetProcAddress(hRealXInput, "XInputGetState");
-            orig_XInputSetState = (t_XInputSetState)GetProcAddress(hRealXInput, "XInputSetState");
-            orig_XInputGetCapabilities = (t_XInputGetCapabilities)GetProcAddress(hRealXInput, "XInputGetCapabilities");
-            orig_XInputEnable = (t_XInputEnable)GetProcAddress(hRealXInput, "XInputEnable");
-            orig_XInputGetDSoundAudioDeviceGuids = (t_XInputGetDSoundAudioDeviceGuids)GetProcAddress(hRealXInput, "XInputGetDSoundAudioDeviceGuids");
-            orig_XInputGetBatteryInformation = (t_XInputGetBatteryInformation)GetProcAddress(hRealXInput, "XInputGetBatteryInformation");
-            orig_XInputGetKeystroke = (t_XInputGetKeystroke)GetProcAddress(hRealXInput, "XInputGetKeystroke");
+            orig_XInputGetState = (t_XInputGetState)GetProcAddress(hRealXInput, (LPCSTR)2);
+            orig_XInputSetState = (t_XInputSetState)GetProcAddress(hRealXInput, (LPCSTR)3);
+            orig_XInputGetCapabilities = (t_XInputGetCapabilities)GetProcAddress(hRealXInput, (LPCSTR)4);
+            orig_XInputEnable = (t_XInputEnable)GetProcAddress(hRealXInput, (LPCSTR)5);
+            orig_XInputGetDSoundAudioDeviceGuids = (t_XInputGetDSoundAudioDeviceGuids)GetProcAddress(hRealXInput, (LPCSTR)6);
+            orig_XInputGetBatteryInformation = (t_XInputGetBatteryInformation)GetProcAddress(hRealXInput, (LPCSTR)7);
+            orig_XInputGetKeystroke = (t_XInputGetKeystroke)GetProcAddress(hRealXInput, (LPCSTR)8);
+            orig_XInputGetStateEx = (t_XInputGetStateEx)GetProcAddress(hRealXInput, (LPCSTR)100);
+            orig_XInputWaitForGuideButton = (t_XInputWaitForGuideButton)GetProcAddress(hRealXInput, (LPCSTR)101);
+            orig_XInputCancelGuideButtonWait = (t_XInputCancelGuideButtonWait)GetProcAddress(hRealXInput, (LPCSTR)102);
+            orig_XInputPowerOffController = (t_XInputPowerOffController)GetProcAddress(hRealXInput, (LPCSTR)103);
         }
     }
 }
@@ -75,6 +87,22 @@ extern "C" {
     DWORD WINAPI XInputGetKeystroke(DWORD dwUserIndex, DWORD dwReserved, void* pKeystroke) {
         if (!orig_XInputGetKeystroke) LoadRealXInput();
         return orig_XInputGetKeystroke ? orig_XInputGetKeystroke(dwUserIndex, dwReserved, pKeystroke) : 1167;
+    }
+    DWORD WINAPI XInputGetStateEx(DWORD dwUserIndex, void* pState) {
+        if (!orig_XInputGetStateEx) LoadRealXInput();
+        return orig_XInputGetStateEx ? orig_XInputGetStateEx(dwUserIndex, pState) : 1167;
+    }
+    DWORD WINAPI XInputWaitForGuideButton(DWORD dwUserIndex, DWORD dwFlag, void* pUnk) {
+        if (!orig_XInputWaitForGuideButton) LoadRealXInput();
+        return orig_XInputWaitForGuideButton ? orig_XInputWaitForGuideButton(dwUserIndex, dwFlag, pUnk) : 1167;
+    }
+    DWORD WINAPI XInputCancelGuideButtonWait(DWORD dwUserIndex) {
+        if (!orig_XInputCancelGuideButtonWait) LoadRealXInput();
+        return orig_XInputCancelGuideButtonWait ? orig_XInputCancelGuideButtonWait(dwUserIndex) : 1167;
+    }
+    DWORD WINAPI XInputPowerOffController(DWORD dwUserIndex) {
+        if (!orig_XInputPowerOffController) LoadRealXInput();
+        return orig_XInputPowerOffController ? orig_XInputPowerOffController(dwUserIndex) : 1167;
     }
 }
 
