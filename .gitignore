@@ -1,0 +1,10 @@
+# Git Ignore
+backup_Binaries_Win64/
+*.zip
+*.log
+*.tmp
+*.dmp
+*.exe
+__pycache__/
+.vscode/
+.idea/
