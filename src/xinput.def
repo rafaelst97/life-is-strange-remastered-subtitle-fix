@@ -1,0 +1,9 @@
+LIBRARY XINPUT1_3.dll
+EXPORTS
+    XInputGetState @100
+    XInputSetState @101
+    XInputGetCapabilities @102
+    XInputEnable @103
+    XInputGetDSoundAudioDeviceGuids @104
+    XInputGetBatteryInformation @108
+    XInputGetKeystroke @109

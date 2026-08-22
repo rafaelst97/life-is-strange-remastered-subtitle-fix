@@ -1,77 +1,89 @@
-# Life is Strange Remastered - Subtitle Fix Mod
+# Life is Strange Remastered - Subtitle & Localization Engine Fix (PC)
 
-Mod para corrigir o bug crônico das legendas no **Life is Strange Remastered** (Unreal Engine 4), onde ao trocar de cenário, sala ou personagem, o jogo exibe os nomes técnicos dos arquivos de áudio (ex: `Act_E2_1A_...`, `Cue_E2_1B_...`) no lugar do texto traduzido.
-
----
-
-## 🔍 Como o Bug Ocorre e Como o Mod Corrige
-
-### Causa Raiz
-No motor Unreal Engine 4 do Remastered, o jogo organiza as legendas em conjuntos de dados em memória (`AltDataSet`) indexados por *Layers de Contexto* (ex: `E2_1A`, `E2_1B`, etc.). Durante as transições de cenário por streaming dinâmico (*Level Streaming*), o jogo falha em instanciar o `AltDataSet` do novo contexto. Ao não encontrar a referência, o motor recorre ao comportamento padrão de fallback e imprime o identificador cru da fala na tela.
-
-### Nossa Solução
-Utilizamos o **UE4SS (Unreal Engine 4 Scripting System)** com injeção segura via proxy `dwmapi.dll` e desenvolvemos um mod em Lua (`SubtitleFixMod`) que:
-1. Carrega todas as **10.475 falas do jogo** traduzidas em tabelas nativas de alta performance.
-2. Intercepta em tempo de execução os hooks das funções visuais de legenda (`SetSubtitleCue`, `UpdateSubtitle`, `UpdateSubtitlesImplementable`).
-3. Quando detecta uma chave técnica (`Act_...`, `Cue_...`), substitui instantaneamente pelo texto correto da fala antes de ser desenhado na tela.
+A high-performance, native C++ mod that resolves the subtitle failure bug in *Life is Strange Remastered* on PC, where subtitles intermittently display raw internal audio cue / file identifiers (such as `Act_E2_1A_...` or `Cue_E1_...`) instead of translated dialogue text after scene transitions or character switches.
 
 ---
 
-## 🚀 Instalação Rápida
+## 🎯 The Issue
 
-### Opção 1: Automática (Windows)
-1. Baixe ou clone este repositório.
-2. Execute o arquivo `install.bat`.
-3. Abra o jogo normalmente.
+In *Life is Strange Remastered*, subtitle loading is handled by the `UDNEAltData` subsystem in Unreal Engine 4. When an audio event triggers:
+1. **Rigid Layer Name Validation**: The engine attempts to extract level/scene prefixes from the audio cue identifier. If a cue string does not strictly match hardcoded patterns (e.g. streaming sub-levels, secondary character lines, or ambient thoughts), the validator fails and aborts early.
+2. **Missing Sub-Level Datasets**: When level streaming loads sub-scenes (e.g., `E2_1B` while only `E2_1A` is initialized in memory), `FindAltDataSetByLayerName` returns `NULL`.
+3. **Fallback Failure**: When lookup fails, the engine defaults to rendering the raw internal cue key on screen.
 
-### Opção 2: Manual
-Copie o conteúdo da pasta `mod_package/Binaries/Win64/` diretamente para a pasta de binários do seu jogo:
-```text
-C:\Games\Life is Strange Remastered\LIS\Binaries\Win64\
+---
+
+## 💡 The Solution
+
+This mod provides a dual-layer, zero-overhead fix:
+
+1. **Native Proxy Mod (`XINPUT1_3.dll`)**:
+   - Built with **MinHook** and compiled using MSVC 2022.
+   - Embeds the master dictionary of **10,475 dialogue lines** in native UTF-16 memory.
+   - Dynamically hooks `FindAltDataSetByLayerName` (`0x1407188a0`) and hooks/patches the rigid validator early-exit (`0x14071023d`).
+   - Ensures that any subtitle request across all 5 episodes, scenes, and characters is resolved against the complete master subtitle database in real time.
+2. **Consolidated Loose `.cue` Dictionaries**:
+   - All `.cue` files in `LIS/Content/AltData/` are populated with complete dialogue dictionaries across all supported languages (`PTB`, `INT`, `ESN`, `FRA`, `DEU`, `ITA`, `JPN`, `ESM`).
+
+---
+
+## 🚀 Installation
+
+### Automated Install (1-Click)
+1. Download or clone this repository.
+2. Run `install.bat`.
+3. Select your game directory if prompted.
+4. Launch the game normally via `LiS.exe` or Steam/Epic.
+
+### Manual Install
+1. Copy `XINPUT1_3.dll` to:
+   ```
+   <GameRoot>\LIS\Binaries\Win64\XINPUT1_3.dll
+   ```
+2. (Optional) Copy the contents of `mod_package/Content/AltData/` to:
+   ```
+   <GameRoot>\LIS\Content\AltData\
+   ```
+
+---
+
+## 🛠️ Building from Source
+
+### Requirements
+- **Windows 10 / 11 (x64)**
+- **Visual Studio 2022** (C++ Desktop Development workload)
+
+### Build Steps
+1. Open PowerShell or Command Prompt.
+2. Navigate to `src/`:
+   ```cmd
+   cd src
+   build_dll.bat
+   ```
+3. The compiled `XINPUT1_3.dll` will be generated in `src/` and automatically copied to your game directory.
+
+---
+
+## 📁 Repository Structure
+
 ```
-(ou o diretório correspondente da sua instalação Steam / Epic Games).
-
----
-
-## 📁 Estrutura do Repositório
-
-```text
-├── mod_package/                     # Arquivos do mod prontos para distribuição
-│   └── Binaries/Win64/
-│       ├── dwmapi.dll               # Proxy DLL do UE4SS
-│       ├── UE4SS.dll                # Engine do UE4SS
-│       ├── UE4SS-settings.ini       # Configurações do UE4SS
-│       └── Mods/
-│           ├── mods.txt             # Lista de mods ativos
-│           └── SubtitleFixMod/
-│               └── Scripts/
-│                   ├── main.lua     # Hook de interceptação e substituição
-│                   └── subtitles_*.lua  # Dicionários de todas as 10.475 falas por idioma
-├── tools/                           # Scripts Python auxiliares de engenharia reversa
-│   ├── generate_lua_dicts.py        # Gera as tabelas Lua a partir dos arquivos .cue
-│   ├── apply_subtitle_mod.py        # Consolidador de arquivos .cue
-│   ├── build_pak_mod.py             # Gerador de patch .pak
-│   └── restore_original_subtitles.py# Script de restauração
-├── install.bat                      # Instalador automático
-└── README.md
+├── install.bat             # 1-Click Batch Installer
+├── README.md               # Mod Documentation (English)
+├── src/                    # C++ Source Code
+│   ├── xinput_proxy.cpp    # Proxy DLL & MinHook Subtitle Interceptor
+│   ├── xinput.def          # Export definitions
+│   ├── subtitles_data.h    # Embedded UTF-16 subtitle dataset
+│   ├── build_dll.bat       # MSVC compiler script
+│   └── minhook/            # MinHook hooking library
+├── tools/                  # Python Reverse Engineering & Analysis Tools
+│   ├── apply_master_fix.py # Binary patch generator
+│   └── gen_master_bin.py   # UTF-16 binary database generator
+└── mod_package/            # Ready-to-use distribution package
+    └── Binaries/Win64/
+        └── XINPUT1_3.dll   # Compiled mod binary
 ```
 
 ---
 
-## 🌐 Idiomas Suportados
-- 🇧🇷 Português do Brasil (`PTB`) - Ativo por padrão
-- 🇺🇸 Inglês (`INT`)
-- 🇫🇷 Francês (`FRA`)
-- 🇩🇪 Alemão (`DEU`)
-- 🇪🇸 Espanhol (`ESM` / `ESN`)
-- 🇮🇹 Italiano (`ITA`)
-- 🇯🇵 Japonês (`JPN`)
-
----
-
-## 🛡️ Desinstalação
-Basta apagar os seguintes arquivos de `LIS\Binaries\Win64\`:
-- `dwmapi.dll`
-- `UE4SS.dll`
-- `UE4SS-settings.ini`
-- `Mods/`
+## 📜 License
+MIT License. Created for the *Life is Strange Remastered* modding community.
