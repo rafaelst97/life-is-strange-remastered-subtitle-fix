@@ -166,31 +166,48 @@ void SetUE4String(UE4String* str, const wchar_t* src) {
     if (!str || !src || !fnFMemoryRealloc) return;
     int32_t charCount = (int32_t)wcslen(src) + 1;
     size_t byteCount = (size_t)charCount * sizeof(wchar_t);
-    wchar_t* newBuf = (wchar_t*)fnFMemoryRealloc(str->Data, byteCount, 0);
+    wchar_t* newBuf = (wchar_t*)fnFMemoryRealloc(NULL, byteCount, 0);
     if (newBuf) {
         memcpy(newBuf, src, byteCount);
+        if (str->Data && fnFMemoryFree) {
+            fnFMemoryFree(str->Data);
+        }
         str->Data = newBuf;
         str->ArrayNum = charCount;
         str->ArrayMax = charCount;
     }
 }
 
-// UDNEAltData::GetSubtitleText(thisPtr, InCue, OutSubtitleText)
-typedef int64_t (__fastcall *t_GetSubtitleText)(void* thisPtr, UE4String* InCue, UE4String* OutSubtitleText);
+// FName::ToString(const uint64_t* pName, UE4String* outStr)
+typedef void* (__fastcall *t_FNameToString)(const uint64_t* pName, UE4String* outStr);
+static t_FNameToString fnFNameToString = NULL;
+
+// UDNEAltData::GetSubtitleText(thisPtr, inCueName, outSubtitleText)
+typedef int64_t (__fastcall *t_GetSubtitleText)(void* thisPtr, uint64_t inCueName, UE4String* outSubtitleText);
 static t_GetSubtitleText orig_GetSubtitleText = NULL;
 
-int64_t __fastcall hook_GetSubtitleText(void* thisPtr, UE4String* InCue, UE4String* OutSubtitleText) {
-    if (InCue && InCue->Data && InCue->ArrayNum > 1) {
-        std::wstring cue(InCue->Data);
-        const wchar_t* trans = FindTranslation(cue);
-        if (trans) {
-            SetUE4String(OutSubtitleText, trans);
-            return 0; // Success!
+int64_t __fastcall hook_GetSubtitleText(void* thisPtr, uint64_t inCueName, UE4String* outSubtitleText) {
+    if (inCueName != 0 && fnFNameToString) {
+        UE4String tempStr = { nullptr, 0, 0 };
+        fnFNameToString(&inCueName, &tempStr);
+        if (tempStr.Data && tempStr.ArrayNum > 1) {
+            std::wstring cue(tempStr.Data);
+            const wchar_t* trans = FindTranslation(cue);
+            if (trans) {
+                SetUE4String(outSubtitleText, trans);
+                if (tempStr.Data && fnFMemoryFree) {
+                    fnFMemoryFree(tempStr.Data);
+                }
+                return 3; // Return success code
+            }
+        }
+        if (tempStr.Data && fnFMemoryFree) {
+            fnFMemoryFree(tempStr.Data);
         }
     }
     
     if (orig_GetSubtitleText) {
-        return orig_GetSubtitleText(thisPtr, InCue, OutSubtitleText);
+        return orig_GetSubtitleText(thisPtr, inCueName, outSubtitleText);
     }
     return 1;
 }
@@ -202,9 +219,11 @@ DWORD WINAPI SubtitleModThread(LPVOID lpParam) {
 
     InitSubtitleMap();
 
-    // UE4 Allocators:
+    // UE4 Functions:
+    // FName::ToString at RVA 0xb30120
     // FMemory::Realloc at RVA 0xa75240
     // FMemory::Free at RVA 0xa666d0
+    fnFNameToString = (t_FNameToString)(base + 0xb30120);
     fnFMemoryRealloc = (t_FMemoryRealloc)(base + 0xa75240);
     fnFMemoryFree = (t_FMemoryFree)(base + 0xa666d0);
 
