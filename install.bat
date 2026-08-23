@@ -28,18 +28,19 @@ if not exist "%GAME_DIR%\LIS\Binaries\Win64\LiS-Win64-Shipping.exe" (
 
 echo [OK] Game directory detected: "%GAME_DIR%"
 echo.
-echo Installing Native Subtitle Fix Mod (XINPUT1_3.dll)...
+echo Installing Subtitle Fix Mod (Native Proxy + UE4 Engine Fixes)...
 
-copy /Y "%~dp0mod_package\Binaries\Win64\XINPUT1_3.dll" "%GAME_DIR%\LIS\Binaries\Win64\XINPUT1_3.dll" >nul
+xcopy /E /I /Y "%~dp0mod_package\Binaries\Win64" "%GAME_DIR%\LIS\Binaries\Win64" >nul
 
 if %ERRORLEVEL% NEQ 0 (
     color 0C
-    echo [ERROR] Failed to copy XINPUT1_3.dll. Make sure the game is closed.
+    echo [ERROR] Failed to install mod files. Make sure the game is closed.
     pause
     exit /b 1
 )
 
-echo [SUCCESS] Mod installed successfully!
-echo You can now launch Life is Strange Remastered normally.
+echo [SUCCESS] Subtitle Fix Mod installed successfully!
+echo All subtitle bug fixes across Episodes 1 to 5 are now active.
+echo You can launch Life is Strange Remastered normally via Steam, Epic, or LiS.exe.
 echo.
 pause

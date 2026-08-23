@@ -116,10 +116,10 @@ struct UE4String {
 };
 
 // --- UE4 Allocator Functions ---
-typedef void* (*t_FMemoryMalloc)(size_t Count, uint32_t Alignment);
+typedef void* (*t_FMemoryRealloc)(void* Original, size_t Count, uint32_t Alignment);
 typedef void (*t_FMemoryFree)(void* Original);
 
-static t_FMemoryMalloc fnFMemoryMalloc = NULL;
+static t_FMemoryRealloc fnFMemoryRealloc = NULL;
 static t_FMemoryFree fnFMemoryFree = NULL;
 
 static std::unordered_map<std::wstring, std::wstring> g_SubtitleMap;
@@ -131,49 +131,68 @@ void InitSubtitleMap() {
     while (p < end && *p != L'\0') {
         std::wstring key = p;
         p += key.length() + 1;
-        if (p >= end) break;
+        if (p >= end || *p == L'\0') break;
         std::wstring val = p;
         p += val.length() + 1;
         g_SubtitleMap[key] = val;
     }
 }
 
-void SetUE4String(UE4String* str, const wchar_t* src) {
-    if (!str || !src || !fnFMemoryMalloc || !fnFMemoryFree) return;
-    int32_t len = (int32_t)wcslen(src) + 1;
-    if (str->Data) {
-        fnFMemoryFree(str->Data);
-        str->Data = NULL;
+const wchar_t* FindTranslation(const std::wstring& cue) {
+    if (g_SubtitleMap.empty()) return nullptr;
+    
+    // Direct lookup
+    auto it = g_SubtitleMap.find(cue);
+    if (it != g_SubtitleMap.end()) return it->second.c_str();
+
+    // Strip Play_
+    if (cue.rfind(L"Play_", 0) == 0) {
+        std::wstring stripped = cue.substr(5);
+        it = g_SubtitleMap.find(stripped);
+        if (it != g_SubtitleMap.end()) return it->second.c_str();
     }
-    size_t bytes = (size_t)len * sizeof(wchar_t);
-    str->Data = (wchar_t*)fnFMemoryMalloc(bytes, 0);
-    if (str->Data) {
-        memcpy(str->Data, src, bytes);
-        str->ArrayNum = len;
-        str->ArrayMax = len;
-    } else {
-        str->ArrayNum = 0;
-        str->ArrayMax = 0;
+    
+    // Strip Cue_ or Act_
+    if (cue.rfind(L"Cue_", 0) == 0 || cue.rfind(L"Act_", 0) == 0) {
+        std::wstring stripped = cue.substr(4);
+        it = g_SubtitleMap.find(stripped);
+        if (it != g_SubtitleMap.end()) return it->second.c_str();
+    }
+
+    return nullptr;
+}
+
+void SetUE4String(UE4String* str, const wchar_t* src) {
+    if (!str || !src || !fnFMemoryRealloc) return;
+    int32_t charCount = (int32_t)wcslen(src) + 1;
+    size_t byteCount = (size_t)charCount * sizeof(wchar_t);
+    wchar_t* newBuf = (wchar_t*)fnFMemoryRealloc(str->Data, byteCount, 0);
+    if (newBuf) {
+        memcpy(newBuf, src, byteCount);
+        str->Data = newBuf;
+        str->ArrayNum = charCount;
+        str->ArrayMax = charCount;
     }
 }
 
+// UDNEAltData::GetSubtitleText(thisPtr, InCue, OutSubtitleText)
 typedef int64_t (__fastcall *t_GetSubtitleText)(void* thisPtr, UE4String* InCue, UE4String* OutSubtitleText);
 static t_GetSubtitleText orig_GetSubtitleText = NULL;
 
 int64_t __fastcall hook_GetSubtitleText(void* thisPtr, UE4String* InCue, UE4String* OutSubtitleText) {
-    int64_t res = 0;
-    if (orig_GetSubtitleText) {
-        res = orig_GetSubtitleText(thisPtr, InCue, OutSubtitleText);
-    }
     if (InCue && InCue->Data && InCue->ArrayNum > 1) {
         std::wstring cue(InCue->Data);
-        auto it = g_SubtitleMap.find(cue);
-        if (it != g_SubtitleMap.end()) {
-            SetUE4String(OutSubtitleText, it->second.c_str());
+        const wchar_t* trans = FindTranslation(cue);
+        if (trans) {
+            SetUE4String(OutSubtitleText, trans);
             return 0; // Success!
         }
     }
-    return res;
+    
+    if (orig_GetSubtitleText) {
+        return orig_GetSubtitleText(thisPtr, InCue, OutSubtitleText);
+    }
+    return 1;
 }
 
 DWORD WINAPI SubtitleModThread(LPVOID lpParam) {
@@ -184,14 +203,14 @@ DWORD WINAPI SubtitleModThread(LPVOID lpParam) {
     InitSubtitleMap();
 
     // UE4 Allocators:
-    // FMemory::Malloc at RVA 0xa66980
-    // FMemory::Free at RVA 0xa668d0
-    fnFMemoryMalloc = (t_FMemoryMalloc)(base + 0xa66980);
-    fnFMemoryFree = (t_FMemoryFree)(base + 0xa668d0);
+    // FMemory::Realloc at RVA 0xa75240
+    // FMemory::Free at RVA 0xa666d0
+    fnFMemoryRealloc = (t_FMemoryRealloc)(base + 0xa75240);
+    fnFMemoryFree = (t_FMemoryFree)(base + 0xa666d0);
 
-    // Hook GetSubtitleText at RVA 0x70fd40
+    // Hook UDNEAltData::GetSubtitleText at function entry RVA 0x70fb40
     if (MH_Initialize() == MH_OK) {
-        uintptr_t targetFn = base + 0x70fd40;
+        uintptr_t targetFn = base + 0x70fb40;
         MH_CreateHook((LPVOID)targetFn, (LPVOID)&hook_GetSubtitleText, (LPVOID*)&orig_GetSubtitleText);
         MH_EnableHook((LPVOID)targetFn);
     }
