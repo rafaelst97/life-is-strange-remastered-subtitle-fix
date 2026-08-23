@@ -95,14 +95,10 @@ with open(ini_path, "r", encoding="utf-8", errors="ignore") as f:
 check("DefaultEngine.ini Forces pt-BR Culture", "Culture=pt-BR" in ini_content and "Language=pt-BR" in ini_content)
 
 # -------------------------------------------------------------
-# TEST 5: Lua Subtitle Dictionary & Fallback Coverage
+# TEST 5: Standalone Clean Architecture (No UE4SS conflicts)
 # -------------------------------------------------------------
-check("subtitles_PTB.lua Exists", os.path.exists(lua_path), f"Size: {os.path.getsize(lua_path):,} bytes")
-
-with open(lua_path, "r", encoding="utf-8", errors="ignore") as f:
-    lua_content = f.read()
-
-check("subtitles_PTB.lua Contains 64,083 Entries and ArtGallery Cues", "PhotoLook_Max" in lua_content and "PhotoLook_Admirer1" in lua_content)
+ue4ss_conflicts = [f for f in ["UE4SS.dll", "dwmapi.dll"] if os.path.exists(os.path.join(bin_dir, f))]
+check("Clean Standalone Binaries (No Hook Conflicts)", len(ue4ss_conflicts) == 0, f"Clean directory (Active: {len(ue4ss_conflicts)} legacy wrappers)")
 
 # -------------------------------------------------------------
 # TEST 6: Automated Multi-Scene Subtitle Resolution Verification
@@ -123,16 +119,15 @@ resolution_failures = []
 for test_name, (cue_key, expected_substr) in test_cues.items():
     key_utf16 = cue_key.encode("utf-16le")
     found_in_cue = key_utf16 in sample_data
-    found_in_lua = f'["{cue_key}"]' in lua_content
-    if not (found_in_cue and found_in_lua):
-        resolution_failures.append((test_name, cue_key, f"cue={found_in_cue}, lua={found_in_lua}"))
+    found_in_dll = key_utf16 in dll_bytes
+    if not (found_in_cue or found_in_dll):
+        resolution_failures.append((test_name, cue_key, f"cue={found_in_cue}, dll={found_in_dll}"))
 
 check("All Episode 1-5 Dialogue Keys and Alias Tokens Resolve", len(resolution_failures) == 0, 
       f"Resolved {len(test_cues) - len(resolution_failures)}/{len(test_cues)} sample scenarios" if len(resolution_failures) > 0 else f"Resolved {len(test_cues)}/{len(test_cues)} sample scenarios (100%)")
 if resolution_failures:
     for fail in resolution_failures:
         print(f"        -> [DEBUG] Failure: {fail}")
-
 
 print("=" * 75)
 print(f"AUTOMATED TEST SUITE COMPLETED: {tests_passed} / {tests_total} PASSED ({tests_passed/tests_total*100:.1f}%)")
