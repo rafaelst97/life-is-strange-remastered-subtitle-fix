@@ -83,10 +83,12 @@ O jogo volta ao comportamento original.
 
 ## Como verificar se está funcionando
 
-Depois de abrir o jogo, abra o arquivo:
+Depois de abrir o jogo, abra o arquivo de log criado ao lado do DLL:
+
 ```
-<PastaDoJogo>\debug.log
+<PastaDoJogo>\LIS\Binaries\Win64\LiS_SubtitleFix.log
 ```
+
 Uma instalação bem-sucedida registra linhas como:
 ```
 [LiS_SubMod] DllMain ATTACH
@@ -97,6 +99,12 @@ Uma instalação bem-sucedida registra linhas como:
 Se algum cue ainda falhar, ele é registrado como `[HOOK] NO MATCH ...`.
 Com esta correção, os cues de legenda são resolvidos sem precisar trocar de
 idioma.
+
+## O que NÃO é necessário
+
+A correção é totalmente autocontida no único arquivo `XINPUT1_3.dll`. Você
+**não** precisa substituir nenhum arquivo `.cue` em `LIS\Content\AltData`,
+editar `.ini` nem modificar o executável do jogo.
 
 ## Compilar a partir do código-fonte
 

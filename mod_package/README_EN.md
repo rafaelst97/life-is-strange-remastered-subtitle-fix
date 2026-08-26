@@ -80,10 +80,12 @@ game will return to its original behavior.
 
 ## Verifying it works
 
-After launching the game, open:
+After launching the game, open the log file that is created next to the DLL:
+
 ```
-<GameFolder>\debug.log
+<GameFolder>\LIS\Binaries\Win64\LiS_SubtitleFix.log
 ```
+
 A successful install logs entries like:
 ```
 [LiS_SubMod] DllMain ATTACH
@@ -93,6 +95,12 @@ A successful install logs entries like:
 ```
 If some cue still fails to resolve, it is logged as `[HOOK] NO MATCH ...`.
 With this fix, subtitle cues resolve without needing any language change.
+
+## What is NOT needed
+
+The fix is fully self-contained in the single `XINPUT1_3.dll`. You do **not**
+need to replace any `.cue` files in `LIS\Content\AltData`, edit any `.ini`,
+or modify the game executable.
 
 ## Building from source
 

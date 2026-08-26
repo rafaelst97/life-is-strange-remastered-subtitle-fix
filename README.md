@@ -75,7 +75,8 @@ Delete the `XINPUT1_3.dll` files you copied. No other files are modified.
 
 ## Verifying the fix
 
-After launching the game, check `<GameRoot>\debug.log` for:
+After launching the game, check the log created next to the proxy DLL
+(`<GameRoot>\LIS\Binaries\Win64\LiS_SubtitleFix.log`) for:
 ```
 [LiS_SubMod] DllMain ATTACH
 [DEBUG] GetSubtitleText hook created and enabled at ...
@@ -113,7 +114,9 @@ the game directory and `mod_package/`.
 │   ├── build_dll.bat       # MSVC compiler script
 │   └── minhook/            # MinHook hooking library
 ├── tools/                  # Python Reverse Engineering & Analysis Tools
-└── mod_package/            # Ready-to-use distribution package
+├── dist/                   # Ready-to-share community package
+│   └── LiS_Subtitle_Fix_v2.0.zip  # Flat package (DLL + install/uninstall + EN/PT-BR guides)
+└── mod_package/            # In-repo distribution package
     ├── Binaries/Win64/
     │   └── XINPUT1_3.dll   # Compiled mod binary
     ├── README_EN.md        # Install guide (English)
