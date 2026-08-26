@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <cstdint>
+#include <cstdarg>
 #include <string>
 #include <unordered_map>
 #include "minhook/include/MinHook.h"
@@ -136,27 +137,65 @@ void InitSubtitleMap() {
         p += val.length() + 1;
         g_SubtitleMap[key] = val;
     }
+
+    // Log map stats and first 5 entries
+    FILE* fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
+    if (fdebug) {
+        fwprintf(fdebug, L"[INIT] SubtitleMap loaded: %zu entries\n", g_SubtitleMap.size());
+        int count = 0;
+        for (auto& kv : g_SubtitleMap) {
+            if (count++ >= 5) break;
+            fwprintf(fdebug, L"[INIT]   key='%s' val='%.60s...'\n", kv.first.c_str(), kv.second.c_str());
+        }
+        fclose(fdebug);
+    }
 }
 
-const wchar_t* FindTranslation(const std::wstring& cue) {
+// The runtime cue FName normally carries a UE4 object instance suffix such as
+// "Cue_E5_7Z_..._010_C_2147222737". Strip the trailing "_C_<digits>" so the key
+// matches the master subtitle database.
+static std::wstring StripObjectSuffix(const std::wstring& s) {
+    size_t pos = s.rfind(L"_C_");
+    if (pos != std::wstring::npos && pos + 3 < s.length()) {
+        bool allDigits = true;
+        for (size_t i = pos + 3; i < s.length(); ++i) {
+            if (s[i] < L'0' || s[i] > L'9') { allDigits = false; break; }
+        }
+        if (allDigits) return s.substr(0, pos);
+    }
+    return s;
+}
+
+const wchar_t* FindTranslation(const std::wstring& rawCue) {
     if (g_SubtitleMap.empty()) return nullptr;
-    
-    // Direct lookup
+
+    std::wstring cue = StripObjectSuffix(rawCue);
+
+    // 1) Direct lookup against the canonical key.
     auto it = g_SubtitleMap.find(cue);
     if (it != g_SubtitleMap.end()) return it->second.c_str();
 
-    // Strip Play_
-    if (cue.rfind(L"Play_", 0) == 0) {
-        std::wstring stripped = cue.substr(5);
-        it = g_SubtitleMap.find(stripped);
-        if (it != g_SubtitleMap.end()) return it->second.c_str();
+    // 2) Strip leading "Play_" / "Cue_" / "Act_" prefixes and retry.
+    static const wchar_t* kPrefixes[] = { L"Play_", L"Cue_", L"Act_" };
+    for (const wchar_t* p : kPrefixes) {
+        size_t plen = wcslen(p);
+        if (cue.compare(0, plen, p) == 0) {
+            it = g_SubtitleMap.find(cue.substr(plen));
+            if (it != g_SubtitleMap.end()) return it->second.c_str();
+        }
     }
-    
-    // Strip Cue_ or Act_
-    if (cue.rfind(L"Cue_", 0) == 0 || cue.rfind(L"Act_", 0) == 0) {
-        std::wstring stripped = cue.substr(4);
-        it = g_SubtitleMap.find(stripped);
+
+    // 3) Progressive suffix matching: drop leading scene/layer tokens until a
+    //    shorter alias (e.g. "VoiceOver_Max_010") is found in the database.
+    size_t start = 0;
+    while ((start = cue.find(L'_', start)) != std::wstring::npos) {
+        size_t next = start + 1;
+        if (next >= cue.length()) break;
+        std::wstring candidate = cue.substr(next);
+        if (candidate.length() < 4) break;
+        it = g_SubtitleMap.find(candidate);
         if (it != g_SubtitleMap.end()) return it->second.c_str();
+        start = next;
     }
 
     return nullptr;
@@ -186,26 +225,77 @@ static t_FNameToString fnFNameToString = NULL;
 typedef int64_t (__fastcall *t_GetSubtitleText)(void* thisPtr, uint64_t inCueName, UE4String* outSubtitleText);
 static t_GetSubtitleText orig_GetSubtitleText = NULL;
 
+static const wchar_t* kDebugLogPath = L"C:/Games/Life is Strange Remastered/debug.log";
+
+static void DebugWrite(const wchar_t* fmt, ...) {
+    FILE* fdebug = _wfopen(kDebugLogPath, L"a");
+    if (!fdebug) return;
+    va_list args;
+    va_start(args, fmt);
+    vfwprintf(fdebug, fmt, args);
+    va_end(args);
+    fclose(fdebug);
+}
+
+// UDNEAltData::FindAltDataSetByLayerName(thisPtr, flag, layerName)
+// Returns the FAltDataSet element (0x88 bytes) whose LayerName matches, or
+// NULL when the requested level/sub-level dataset is not loaded in memory.
+// The vanilla fallback in GetSubtitleText then renders the raw cue key on
+// screen - this is the exact "filename instead of subtitle" bug. We hook it
+// and, on failure, hand back the first loaded dataset: because every .cue
+// file ships the consolidated master database, the subsequent cue lookup in
+// GetSubtitleText always succeeds regardless of the selected language.
+typedef void* (__fastcall *t_FindAltDataSetByLayerName)(void* thisPtr, uint8_t flag, uint64_t layerName);
+static t_FindAltDataSetByLayerName orig_FindAltDataSetByLayerName = NULL;
+
+void* __fastcall hook_FindAltDataSetByLayerName(void* thisPtr, uint8_t flag, uint64_t layerName) {
+    void* result = NULL;
+    if (orig_FindAltDataSetByLayerName) {
+        result = orig_FindAltDataSetByLayerName(thisPtr, flag, layerName);
+    }
+    if (result) return result;
+
+    // Fallback: return the first loaded dataset so the caller can still
+    // resolve the cue against the consolidated subtitle data.
+    if (thisPtr) {
+        uintptr_t arrayOffset = flag ? 0x78 : 0x68;
+        uintptr_t* arr = (uintptr_t*)((char*)thisPtr + arrayOffset);
+        if (arr && *(int32_t*)((char*)arr + 8) > 0) {
+            return (void*)arr[0];
+        }
+    }
+    return NULL;
+}
+
 int64_t __fastcall hook_GetSubtitleText(void* thisPtr, uint64_t inCueName, UE4String* outSubtitleText) {
     if (inCueName != 0 && fnFNameToString) {
         UE4String tempStr = { nullptr, 0, 0 };
         fnFNameToString(&inCueName, &tempStr);
         if (tempStr.Data && tempStr.ArrayNum > 1) {
             std::wstring cue(tempStr.Data);
+
             const wchar_t* trans = FindTranslation(cue);
             if (trans) {
                 SetUE4String(outSubtitleText, trans);
                 if (tempStr.Data && fnFMemoryFree) {
                     fnFMemoryFree(tempStr.Data);
                 }
-                return 3; // Return success code
+                return 0;
+            } else {
+                // Only report the first few misses to avoid unbounded log growth.
+                static LONG s_missLogCount = 0;
+                if (InterlockedIncrement(&s_missLogCount) <= 100) {
+                    DebugWrite(L"[HOOK] NO MATCH for cue='%s' mapSize=%zu\n", cue.c_str(), g_SubtitleMap.size());
+                }
             }
         }
         if (tempStr.Data && fnFMemoryFree) {
             fnFMemoryFree(tempStr.Data);
         }
+    } else {
+        DebugWrite(L"[HOOK] called but inCueName=0 or fnFNameToString=NULL\n");
     }
-    
+
     if (orig_GetSubtitleText) {
         return orig_GetSubtitleText(thisPtr, inCueName, outSubtitleText);
     }
@@ -227,20 +317,67 @@ DWORD WINAPI SubtitleModThread(LPVOID lpParam) {
     fnFMemoryRealloc = (t_FMemoryRealloc)(base + 0xa75240);
     fnFMemoryFree = (t_FMemoryFree)(base + 0xa666d0);
 
-    // Hook UDNEAltData::GetSubtitleText at function entry RVA 0x70fb40
-    if (MH_Initialize() == MH_OK) {
-        uintptr_t targetFn = base + 0x70fb40;
-        MH_CreateHook((LPVOID)targetFn, (LPVOID)&hook_GetSubtitleText, (LPVOID*)&orig_GetSubtitleText);
-        MH_EnableHook((LPVOID)targetFn);
-    }
 
+    // ---------------------------------------------------------------------------
+    // Debug logging for MinHook initialization and hook creation
+    // ---------------------------------------------------------------------------
+    if (MH_Initialize() != MH_OK) {
+        FILE* fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
+        if (fdebug) {
+            fwprintf(fdebug, L"[DEBUG] MinHook initialization failed\n");
+            fclose(fdebug);
+        }
+    } else {
+        FILE* fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
+        if (fdebug) {
+            fwprintf(fdebug, L"[DEBUG] MinHook initialized successfully\n");
+            fclose(fdebug);
+        }
+        uintptr_t targetFn = base + 0x70fb40;
+        if (MH_CreateHook((LPVOID)targetFn, (LPVOID)&hook_GetSubtitleText, (LPVOID*)&orig_GetSubtitleText) == MH_OK) {
+            MH_EnableHook((LPVOID)targetFn);
+            fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
+            if (fdebug) {
+                fwprintf(fdebug, L"[DEBUG] GetSubtitleText hook created and enabled at %p\n", (void*)targetFn);
+                fclose(fdebug);
+            }
+        } else {
+            fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
+            if (fdebug) {
+                fwprintf(fdebug, L"[DEBUG] GetSubtitleText hook creation failed at %p\n", (void*)targetFn);
+                fclose(fdebug);
+            }
+        }
+
+        uintptr_t targetFn2 = base + 0x7188a0;
+        if (MH_CreateHook((LPVOID)targetFn2, (LPVOID)&hook_FindAltDataSetByLayerName, (LPVOID*)&orig_FindAltDataSetByLayerName) == MH_OK) {
+            MH_EnableHook((LPVOID)targetFn2);
+            fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
+            if (fdebug) {
+                fwprintf(fdebug, L"[DEBUG] FindAltDataSetByLayerName hook created and enabled at %p\n", (void*)targetFn2);
+                fclose(fdebug);
+            }
+        } else {
+            fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
+            if (fdebug) {
+                fwprintf(fdebug, L"[DEBUG] FindAltDataSetByLayerName hook creation failed at %p\n", (void*)targetFn2);
+                fclose(fdebug);
+            }
+        }
+    }
     return 0;
 }
+
+
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hModule);
+        {
+            FILE* f = fopen("debug.log", "a");
+            if (f) { fwprintf(f, L"[LiS_SubMod] DllMain ATTACH\n"); fclose(f); }
+        }
         LoadRealXInput();
         CreateThread(NULL, 0, SubtitleModThread, NULL, 0, NULL);
         break;
@@ -252,3 +389,5 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     }
     return TRUE;
 }
+
+

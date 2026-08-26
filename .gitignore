@@ -1,10 +1,15 @@
 # Git Ignore
 backup_Binaries_Win64/
+backup_original_AltData/
+pak_staging/
 *.zip
 *.log
 *.tmp
 *.dmp
 *.exe
+*.obj
+*.lib
+*.exp
 __pycache__/
 .vscode/
 .idea/
