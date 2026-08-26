@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include "minhook/include/MinHook.h"
+#include "subtitle_lookup.h"
 #include "subtitles_data.h"
 
 #pragma comment(lib, "user32.lib")
@@ -178,55 +179,10 @@ void InitSubtitleMap() {
     }
 }
 
-// The runtime cue FName normally carries a UE4 object instance suffix such as
-// "Cue_E5_7Z_..._010_C_2147222737". Strip the trailing "_C_<digits>" so the key
-// matches the master subtitle database.
-static std::wstring StripObjectSuffix(const std::wstring& s) {
-    size_t pos = s.rfind(L"_C_");
-    if (pos != std::wstring::npos && pos + 3 < s.length()) {
-        bool allDigits = true;
-        for (size_t i = pos + 3; i < s.length(); ++i) {
-            if (s[i] < L'0' || s[i] > L'9') { allDigits = false; break; }
-        }
-        if (allDigits) return s.substr(0, pos);
-    }
-    return s;
-}
+// Subtitle lookup (StripObjectSuffix / FindTranslation) lives in
+// subtitle_lookup.h so the exact same code is exercised by the standalone
+// test harness in tools/test_lookup.cpp.
 
-const wchar_t* FindTranslation(const std::wstring& rawCue) {
-    if (g_SubtitleMap.empty()) return nullptr;
-
-    std::wstring cue = StripObjectSuffix(rawCue);
-
-    // 1) Direct lookup against the canonical key.
-    auto it = g_SubtitleMap.find(cue);
-    if (it != g_SubtitleMap.end()) return it->second.c_str();
-
-    // 2) Strip leading "Play_" / "Cue_" / "Act_" prefixes and retry.
-    static const wchar_t* kPrefixes[] = { L"Play_", L"Cue_", L"Act_" };
-    for (const wchar_t* p : kPrefixes) {
-        size_t plen = wcslen(p);
-        if (cue.compare(0, plen, p) == 0) {
-            it = g_SubtitleMap.find(cue.substr(plen));
-            if (it != g_SubtitleMap.end()) return it->second.c_str();
-        }
-    }
-
-    // 3) Progressive suffix matching: drop leading scene/layer tokens until a
-    //    shorter alias (e.g. "VoiceOver_Max_010") is found in the database.
-    size_t start = 0;
-    while ((start = cue.find(L'_', start)) != std::wstring::npos) {
-        size_t next = start + 1;
-        if (next >= cue.length()) break;
-        std::wstring candidate = cue.substr(next);
-        if (candidate.length() < 4) break;
-        it = g_SubtitleMap.find(candidate);
-        if (it != g_SubtitleMap.end()) return it->second.c_str();
-        start = next;
-    }
-
-    return nullptr;
-}
 
 void SetUE4String(UE4String* str, const wchar_t* src) {
     if (!str || !src || !fnFMemoryRealloc) return;
@@ -289,7 +245,7 @@ int64_t __fastcall hook_GetSubtitleText(void* thisPtr, uint64_t inCueName, UE4St
         if (tempStr.Data && tempStr.ArrayNum > 1) {
             std::wstring cue(tempStr.Data);
 
-            const wchar_t* trans = FindTranslation(cue);
+            const wchar_t* trans = FindTranslation(g_SubtitleMap, cue);
             if (trans) {
                 SetUE4String(outSubtitleText, trans);
                 if (tempStr.Data && fnFMemoryFree) {
