@@ -125,6 +125,37 @@ static t_FMemoryFree fnFMemoryFree = NULL;
 
 static std::unordered_map<std::wstring, std::wstring> g_SubtitleMap;
 
+// Diagnostic log lives next to the proxy DLL itself so the mod works from any
+// game installation path (no hard-coded machine-specific location).
+static wchar_t g_LogPath[MAX_PATH] = { 0 };
+
+static void InitLogPath(HMODULE hModule) {
+    if (g_LogPath[0] != L'\0') return;
+    wchar_t modulePath[MAX_PATH] = { 0 };
+    if (GetModuleFileNameW(hModule, modulePath, MAX_PATH) == 0) {
+        wcscpy_s(g_LogPath, L"LiS_SubtitleFix.log");
+        return;
+    }
+    wchar_t* dot = wcsrchr(modulePath, L'.');
+    if (dot) {
+        wcscpy_s(dot, MAX_PATH - (size_t)(dot - modulePath), L".log");
+    } else {
+        wcscat_s(modulePath, L".log");
+    }
+    wcscpy_s(g_LogPath, modulePath);
+}
+
+static void DebugWrite(const wchar_t* fmt, ...) {
+    if (g_LogPath[0] == L'\0') return;
+    FILE* fdebug = _wfopen(g_LogPath, L"a");
+    if (!fdebug) return;
+    va_list args;
+    va_start(args, fmt);
+    vfwprintf(fdebug, fmt, args);
+    va_end(args);
+    fclose(fdebug);
+}
+
 void InitSubtitleMap() {
     if (!g_SubtitleMap.empty()) return;
     const wchar_t* p = (const wchar_t*)g_MasterSubtitleData;
@@ -139,15 +170,11 @@ void InitSubtitleMap() {
     }
 
     // Log map stats and first 5 entries
-    FILE* fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
-    if (fdebug) {
-        fwprintf(fdebug, L"[INIT] SubtitleMap loaded: %zu entries\n", g_SubtitleMap.size());
-        int count = 0;
-        for (auto& kv : g_SubtitleMap) {
-            if (count++ >= 5) break;
-            fwprintf(fdebug, L"[INIT]   key='%s' val='%.60s...'\n", kv.first.c_str(), kv.second.c_str());
-        }
-        fclose(fdebug);
+    DebugWrite(L"[INIT] SubtitleMap loaded: %zu entries\n", g_SubtitleMap.size());
+    int count = 0;
+    for (auto& kv : g_SubtitleMap) {
+        if (count++ >= 5) break;
+        DebugWrite(L"[INIT]   key='%s' val='%.60s...'\n", kv.first.c_str(), kv.second.c_str());
     }
 }
 
@@ -224,18 +251,6 @@ static t_FNameToString fnFNameToString = NULL;
 // UDNEAltData::GetSubtitleText(thisPtr, inCueName, outSubtitleText)
 typedef int64_t (__fastcall *t_GetSubtitleText)(void* thisPtr, uint64_t inCueName, UE4String* outSubtitleText);
 static t_GetSubtitleText orig_GetSubtitleText = NULL;
-
-static const wchar_t* kDebugLogPath = L"C:/Games/Life is Strange Remastered/debug.log";
-
-static void DebugWrite(const wchar_t* fmt, ...) {
-    FILE* fdebug = _wfopen(kDebugLogPath, L"a");
-    if (!fdebug) return;
-    va_list args;
-    va_start(args, fmt);
-    vfwprintf(fdebug, fmt, args);
-    va_end(args);
-    fclose(fdebug);
-}
 
 // UDNEAltData::FindAltDataSetByLayerName(thisPtr, flag, layerName)
 // Returns the FAltDataSet element (0x88 bytes) whose LayerName matches, or
@@ -322,47 +337,23 @@ DWORD WINAPI SubtitleModThread(LPVOID lpParam) {
     // Debug logging for MinHook initialization and hook creation
     // ---------------------------------------------------------------------------
     if (MH_Initialize() != MH_OK) {
-        FILE* fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
-        if (fdebug) {
-            fwprintf(fdebug, L"[DEBUG] MinHook initialization failed\n");
-            fclose(fdebug);
-        }
+        DebugWrite(L"[DEBUG] MinHook initialization failed\n");
     } else {
-        FILE* fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
-        if (fdebug) {
-            fwprintf(fdebug, L"[DEBUG] MinHook initialized successfully\n");
-            fclose(fdebug);
-        }
+        DebugWrite(L"[DEBUG] MinHook initialized successfully\n");
         uintptr_t targetFn = base + 0x70fb40;
         if (MH_CreateHook((LPVOID)targetFn, (LPVOID)&hook_GetSubtitleText, (LPVOID*)&orig_GetSubtitleText) == MH_OK) {
             MH_EnableHook((LPVOID)targetFn);
-            fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
-            if (fdebug) {
-                fwprintf(fdebug, L"[DEBUG] GetSubtitleText hook created and enabled at %p\n", (void*)targetFn);
-                fclose(fdebug);
-            }
+            DebugWrite(L"[DEBUG] GetSubtitleText hook created and enabled at %p\n", (void*)targetFn);
         } else {
-            fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
-            if (fdebug) {
-                fwprintf(fdebug, L"[DEBUG] GetSubtitleText hook creation failed at %p\n", (void*)targetFn);
-                fclose(fdebug);
-            }
+            DebugWrite(L"[DEBUG] GetSubtitleText hook creation failed at %p\n", (void*)targetFn);
         }
 
         uintptr_t targetFn2 = base + 0x7188a0;
         if (MH_CreateHook((LPVOID)targetFn2, (LPVOID)&hook_FindAltDataSetByLayerName, (LPVOID*)&orig_FindAltDataSetByLayerName) == MH_OK) {
             MH_EnableHook((LPVOID)targetFn2);
-            fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
-            if (fdebug) {
-                fwprintf(fdebug, L"[DEBUG] FindAltDataSetByLayerName hook created and enabled at %p\n", (void*)targetFn2);
-                fclose(fdebug);
-            }
+            DebugWrite(L"[DEBUG] FindAltDataSetByLayerName hook created and enabled at %p\n", (void*)targetFn2);
         } else {
-            fdebug = fopen("C:/Games/Life is Strange Remastered/debug.log", "a");
-            if (fdebug) {
-                fwprintf(fdebug, L"[DEBUG] FindAltDataSetByLayerName hook creation failed at %p\n", (void*)targetFn2);
-                fclose(fdebug);
-            }
+            DebugWrite(L"[DEBUG] FindAltDataSetByLayerName hook creation failed at %p\n", (void*)targetFn2);
         }
     }
     return 0;
@@ -374,10 +365,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     switch (ul_reason_for_call) {
     case DLL_PROCESS_ATTACH:
         DisableThreadLibraryCalls(hModule);
-        {
-            FILE* f = fopen("debug.log", "a");
-            if (f) { fwprintf(f, L"[LiS_SubMod] DllMain ATTACH\n"); fclose(f); }
-        }
+        InitLogPath(hModule);
+        DebugWrite(L"[LiS_SubMod] DllMain ATTACH\n");
         LoadRealXInput();
         CreateThread(NULL, 0, SubtitleModThread, NULL, 0, NULL);
         break;
