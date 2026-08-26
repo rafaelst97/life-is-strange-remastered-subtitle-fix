@@ -4,7 +4,7 @@ title Life is Strange Remastered - Subtitle Fix Installer
 color 0B
 
 echo =======================================================================
-echo     Life is Strange Remastered - Subtitle & Localization Fix
+echo     Life is Strange Remastered - Subtitle Fix Mod
 echo =======================================================================
 echo.
 
@@ -28,22 +28,23 @@ if not exist "%GAME_DIR%\LIS\Binaries\Win64\LiS-Win64-Shipping.exe" (
 
 echo [OK] Game directory detected: "%GAME_DIR%"
 echo.
-echo Installing Subtitle Fix Mod (Native Proxy + UE4 Engine Fixes)...
+echo Installing Subtitle Fix Mod (native proxy hooks)...
+echo.
 
-xcopy /E /I /Y "%~dp0mod_package\Binaries\Win64" "%GAME_DIR%\LIS\Binaries\Win64" >nul
-
+copy /Y "%~dp0Binaries\Win64\XINPUT1_3.dll" "%GAME_DIR%\LIS\Binaries\Win64\XINPUT1_3.dll" >nul
 if %ERRORLEVEL% NEQ 0 (
     color 0C
-    echo [ERROR] Failed to install mod files. Make sure the game is closed.
+    echo [ERROR] Failed to copy XINPUT1_3.dll. Make sure the game is closed.
     pause
     exit /b 1
 )
 
 if exist "%GAME_DIR%\XINPUT1_3.dll" (
-    copy /Y "%~dp0mod_package\Binaries\Win64\XINPUT1_3.dll" "%GAME_DIR%\XINPUT1_3.dll" >nul
+    copy /Y "%~dp0Binaries\Win64\XINPUT1_3.dll" "%GAME_DIR%\XINPUT1_3.dll" >nul
     echo [OK] Updated launcher-side copy at the game root.
 )
 
+echo.
 echo [SUCCESS] Subtitle Fix Mod installed successfully!
 echo Subtitles will no longer break after scene/episode transitions,
 echo in any language. Launch the game normally via Steam, Epic, or LiS.exe.
