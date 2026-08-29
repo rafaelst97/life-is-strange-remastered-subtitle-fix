@@ -29,8 +29,9 @@ In *Life is Strange Remastered*, subtitle loading is handled by the
 
 ## The Solution
 
-A dual-layer, zero-overhead, runtime-only fix (the game executable is never
-modified):
+A four-layer, zero-overhead, runtime-only fix (the game executable is never
+modified). v2.1 adds two more hooks on top of v2.0 to close a residual gap
+that could still show a raw cue name at the very start of Episode 2:
 
 ### 1. Native `GetSubtitleText` interceptor (`XINPUT1_3.dll`)
 - Built with **MinHook** and compiled with MSVC 2022.
@@ -49,6 +50,21 @@ modified):
   loaded dataset instead of `NULL`.
 - Because every `.cue` file ships the consolidated master database, the native
   engine lookup succeeds as a second line of defense.
+
+### 3. `SearchSubtitle` FName normalization (new in v2.1)
+- The runtime cue `FName` sometimes carries a Blueprint instance suffix
+  (`_C_<number>`) that never matches a dataset key, most visibly at the
+  start of Episode 2.
+- This hook strips that suffix before the engine's own hash-table lookup
+  runs, so the native lookup succeeds on the first try instead of falling
+  through to the buggy fallback path.
+
+### 4. Display-time text substitution (new in v2.1)
+- As a last line of defense, the exact `FName::ToString` call the subtitle
+  widget uses to turn a cue name into on-screen text is hooked too.
+- If a cue ever reaches that point unresolved, the mod substitutes the
+  correct translated line before it is drawn, so the player never sees a
+  raw cue key even in the worst case.
 
 ---
 
@@ -81,6 +97,8 @@ After launching the game, check the log created next to the proxy DLL
 [LiS_SubMod] DllMain ATTACH
 [DEBUG] GetSubtitleText hook created and enabled at ...
 [DEBUG] FindAltDataSetByLayerName hook created and enabled at ...
+[DEBUG] SearchSubtitle hook created and enabled at ...
+[DEBUG] FNameToString hook created and enabled at ...
 [INIT] SubtitleMap loaded: ... entries
 ```
 
@@ -115,7 +133,7 @@ the game directory and `mod_package/`.
 │   └── minhook/            # MinHook hooking library
 ├── tools/                  # Python Reverse Engineering & Analysis Tools
 ├── dist/                   # Ready-to-share community package
-│   └── LiS_Subtitle_Fix_v2.0.zip  # Flat package (DLL + install/uninstall + EN/PT-BR guides)
+│   └── LiS_Subtitle_Fix_v2.1.zip  # Flat package (DLL + install/uninstall + EN/PT-BR guides)
 └── mod_package/            # In-repo distribution package
     ├── Binaries/Win64/
     │   └── XINPUT1_3.dll   # Compiled mod binary

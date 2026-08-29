@@ -203,6 +203,66 @@ void SetUE4String(UE4String* str, const wchar_t* src) {
 // FName::ToString(const uint64_t* pName, UE4String* outStr)
 typedef void* (__fastcall *t_FNameToString)(const uint64_t* pName, UE4String* outStr);
 static t_FNameToString fnFNameToString = NULL;
+static t_FNameToString orig_FNameToString = NULL;
+
+// The remastered subtitle pipeline converts the runtime cue FName to a string
+// with FName::ToString and, when the cue is missing from the loaded dataset,
+// displays that string verbatim (the "filename instead of subtitle" bug). We
+// hook FName::ToString at the exact call site used by the subtitle display
+// (the fallback-text conversion in the caller of GetSubtitleText) and, when
+// the name is a runtime subtitle cue ("..._C_<digits>") that exists in the
+// embedded master database, return the translated text so the display shows
+// the real subtitle instead of the raw cue key.
+static uintptr_t g_ModuleBase = 0;
+static uintptr_t g_DisplayToStringRet = 0;
+
+void* __fastcall hook_FNameToString(const uint64_t* pName, UE4String* outStr) {
+    void* result = NULL;
+    if (orig_FNameToString) {
+        result = orig_FNameToString(pName, outStr);
+    }
+    if (!outStr || !outStr->Data || outStr->ArrayNum <= 1 || g_SubtitleMap.empty()) {
+        return result;
+    }
+
+    // Only rewrite the string at the subtitle display call site.
+    if (g_DisplayToStringRet != 0 && (uintptr_t)_ReturnAddress() != g_DisplayToStringRet) {
+        return result;
+    }
+
+    std::wstring name(outStr->Data, (size_t)(outStr->ArrayNum - 1));
+
+    // Only runtime subtitle cue names carry the "_C_<digits>" instance suffix.
+    size_t cpos = name.rfind(L"_C_");
+    if (cpos == std::wstring::npos || cpos + 3 >= name.length()) {
+        return result;
+    }
+    bool allDigits = true;
+    for (size_t i = cpos + 3; i < name.length(); ++i) {
+        if (name[i] < L'0' || name[i] > L'9') { allDigits = false; break; }
+    }
+    if (!allDigits) {
+        return result;
+    }
+
+    const wchar_t* text = FindTranslation(g_SubtitleMap, name);
+    if (!text) {
+        return result;
+    }
+
+    SetUE4String(outStr, text);
+
+    static LONG s_txtLogCount = 0;
+    if (InterlockedIncrement(&s_txtLogCount) <= 60) {
+        DebugWrite(L"[TXT] '%s' -> '%.80s'\n", name.c_str(), text);
+    }
+    return result;
+}
+
+// FName constructor from a null-terminated TCHAR* string:
+//   void FName::FName(const TCHAR* Name, EFindName FindType)   (this = out FName)
+typedef void (__fastcall *t_FNameCtor)(uint64_t* outFName, const wchar_t* name, int32_t findType);
+static t_FNameCtor fnFNameCtor = NULL;
 
 // UDNEAltData::GetSubtitleText(thisPtr, inCueName, outSubtitleText)
 typedef int64_t (__fastcall *t_GetSubtitleText)(void* thisPtr, uint64_t inCueName, UE4String* outSubtitleText);
@@ -224,67 +284,157 @@ void* __fastcall hook_FindAltDataSetByLayerName(void* thisPtr, uint8_t flag, uin
     if (orig_FindAltDataSetByLayerName) {
         result = orig_FindAltDataSetByLayerName(thisPtr, flag, layerName);
     }
+
+    static LONG s_findLogCount = 0;
+    if (InterlockedIncrement(&s_findLogCount) <= 300) {
+        wchar_t layerBuf[256] = L"?";
+        if (fnFNameToString) {
+            UE4String ts = { nullptr, 0, 0 };
+            fnFNameToString(&layerName, &ts);
+            if (ts.Data && ts.ArrayNum > 1) {
+                size_t n = (size_t)(ts.ArrayNum - 1);
+                if (n > 255) n = 255;
+                memcpy(layerBuf, ts.Data, n * sizeof(wchar_t));
+                layerBuf[n] = L'\0';
+            }
+            if (ts.Data && fnFMemoryFree) fnFMemoryFree(ts.Data);
+        }
+        DebugWrite(L"[FIND] layer='%s' flag=%u result=%p", layerBuf, flag, result);
+        if (result) {
+            int8_t dtype = *(int8_t*)((char*)result + 0x18);
+            DebugWrite(L" type=%d\n", dtype);
+        } else {
+            DebugWrite(L" type=-1\n");
+        }
+    }
+
     if (result) return result;
 
-    // Fallback: return the first loaded dataset so the caller can still
-    // resolve the cue against the consolidated subtitle data.
+    // Fallback: the requested level/sub-level dataset is not loaded. Hand back
+    // the first loaded dataset instead of NULL. Because every .cue file ships
+    // the consolidated master database, the subsequent cue lookup in
+    // GetSubtitleText still resolves the correct text.
     if (thisPtr) {
-        uintptr_t arrayOffset = flag ? 0x78 : 0x68;
-        uintptr_t* arr = (uintptr_t*)((char*)thisPtr + arrayOffset);
-        if (arr && *(int32_t*)((char*)arr + 8) > 0) {
-            return (void*)arr[0];
+        uintptr_t offsets[2] = { (uintptr_t)(flag ? 0x78 : 0x68), (uintptr_t)(flag ? 0x68 : 0x78) };
+        for (int i = 0; i < 2; ++i) {
+            uintptr_t* arr = (uintptr_t*)((char*)thisPtr + offsets[i]);
+            if (arr && *(int32_t*)((char*)arr + 8) > 0) {
+                void* fb = (void*)arr[0];
+                DebugWrite(L"[FIND] FALLBACK -> %p (offset=%llx)\n", fb, (unsigned long long)offsets[i]);
+                return fb;
+            }
         }
     }
     return NULL;
 }
 
+// GetSubtitleText(this, cueFName, outPhrases)
 int64_t __fastcall hook_GetSubtitleText(void* thisPtr, uint64_t inCueName, UE4String* outSubtitleText) {
     if (inCueName != 0 && fnFNameToString) {
         UE4String tempStr = { nullptr, 0, 0 };
         fnFNameToString(&inCueName, &tempStr);
         if (tempStr.Data && tempStr.ArrayNum > 1) {
-            std::wstring cue(tempStr.Data);
-
-            const wchar_t* trans = FindTranslation(g_SubtitleMap, cue);
-            if (trans) {
-                SetUE4String(outSubtitleText, trans);
-                if (tempStr.Data && fnFMemoryFree) {
-                    fnFMemoryFree(tempStr.Data);
-                }
-                return 0;
-            } else {
-                // Only report the first few misses to avoid unbounded log growth.
-                static LONG s_missLogCount = 0;
-                if (InterlockedIncrement(&s_missLogCount) <= 100) {
-                    DebugWrite(L"[HOOK] NO MATCH for cue='%s' mapSize=%zu\n", cue.c_str(), g_SubtitleMap.size());
-                }
+            static LONG s_logCount = 0;
+            if (InterlockedIncrement(&s_logCount) <= 300) {
+                DebugWrite(L"[GTXT] cue='%s'\n", tempStr.Data);
             }
         }
         if (tempStr.Data && fnFMemoryFree) {
             fnFMemoryFree(tempStr.Data);
         }
-    } else {
-        DebugWrite(L"[HOOK] called but inCueName=0 or fnFNameToString=NULL\n");
     }
-
     if (orig_GetSubtitleText) {
         return orig_GetSubtitleText(thisPtr, inCueName, outSubtitleText);
     }
     return 1;
 }
 
+// Subtitle dataset hash-table lookup (called from GetSubtitleText).
+//   int Lookup(void* hashTable, int32* outIndex, FName cueFName)
+// The cue FName arrives with the Blueprint instance suffix "_C_<Number>" (e.g.
+// "..._020_C_2147459946") which never matches the dataset keys ("..._020",
+// Number 0), so the lookup fails and the raw cue key is shown. We normalize it
+// (strip "_C_<digits>", Number -> 0) BEFORE the lookup. The "_C_<digits>"
+// pattern only occurs on runtime subtitle cue names, so other callers of this
+// generic hash-table lookup are unaffected.
+typedef int (__fastcall *t_SearchSubtitle)(void* hashTable, int32_t* outIndex, uint64_t cueFName);
+static t_SearchSubtitle orig_SearchSubtitle = NULL;
+
+int __fastcall hook_SearchSubtitle(void* hashTable, int32_t* outIndex, uint64_t cueFName) {
+    uint64_t normFName = cueFName;
+
+    // Skip obviously-invalid FName values before touching the name table.
+    uint32_t lo = (uint32_t)(cueFName & 0xFFFFFFFF);
+    uint32_t hi = (uint32_t)(cueFName >> 32);
+    if (cueFName != 0 && lo != 0xFFFFFFFF && hi != 0xFFFFFFFF &&
+        fnFNameToString && fnFNameCtor && fnFMemoryRealloc) {
+        UE4String tempStr = { nullptr, 0, 0 };
+        fnFNameToString(&cueFName, &tempStr);
+        if (tempStr.Data && tempStr.ArrayNum > 1) {
+            std::wstring cue(tempStr.Data);
+            std::wstring norm = StripObjectSuffix(cue);
+            if (norm != cue) {
+                size_t byteCount = (norm.length() + 1) * sizeof(wchar_t);
+                wchar_t* buf = (wchar_t*)fnFMemoryRealloc(NULL, byteCount, 0);
+                if (buf) {
+                    memcpy(buf, norm.c_str(), byteCount);
+                    fnFNameCtor(&normFName, buf, 1);  // FNAME_Add
+                    fnFMemoryFree(buf);
+
+                    static LONG s_normLogCount = 0;
+                    if (InterlockedIncrement(&s_normLogCount) <= 200) {
+                        DebugWrite(L"[SRCH] NORM '%s' -> '%s'\n", cue.c_str(), norm.c_str());
+                    }
+                }
+            }
+        }
+        if (tempStr.Data && fnFMemoryFree) {
+            fnFMemoryFree(tempStr.Data);
+        }
+    }
+
+    int result = orig_SearchSubtitle(hashTable, outIndex, normFName);
+
+    // Only report "not found" for FNames that look like runtime cue names.
+    if (result < 0 && (uint32_t)(normFName & 0xFFFFFFFF) != 0xFFFFFFFF) {
+        static LONG s_missLogCount = 0;
+        if (InterlockedIncrement(&s_missLogCount) <= 200) {
+            wchar_t nameBuf[256] = L"?";
+            if (fnFNameToString && normFName != 0) {
+                UE4String ts = { nullptr, 0, 0 };
+                fnFNameToString(&normFName, &ts);
+                if (ts.Data && ts.ArrayNum > 1) {
+                    size_t n = (size_t)(ts.ArrayNum - 1);
+                    if (n > 255) n = 255;
+                    memcpy(nameBuf, ts.Data, n * sizeof(wchar_t));
+                    nameBuf[n] = L'\0';
+                }
+                if (ts.Data && fnFMemoryFree) fnFMemoryFree(ts.Data);
+            }
+            DebugWrite(L"[SRCH] MISS fname='%s'\n", nameBuf);
+        }
+    }
+
+    return result;
+}
+
 DWORD WINAPI SubtitleModThread(LPVOID lpParam) {
     HMODULE hMain = GetModuleHandleA(NULL);
     if (!hMain) return 0;
     uintptr_t base = (uintptr_t)hMain;
+    g_ModuleBase = base;
+    // Return address of the display's FName::ToString call (0x14064e02a -> 0x14064e02f)
+    g_DisplayToStringRet = base + 0x64e02f;
 
     InitSubtitleMap();
 
     // UE4 Functions:
     // FName::ToString at RVA 0xb30120
+    // FName::FName(const TCHAR*, EFindName) at RVA 0xb25510
     // FMemory::Realloc at RVA 0xa75240
     // FMemory::Free at RVA 0xa666d0
     fnFNameToString = (t_FNameToString)(base + 0xb30120);
+    fnFNameCtor = (t_FNameCtor)(base + 0xb25510);
     fnFMemoryRealloc = (t_FMemoryRealloc)(base + 0xa75240);
     fnFMemoryFree = (t_FMemoryFree)(base + 0xa666d0);
 
@@ -310,6 +460,24 @@ DWORD WINAPI SubtitleModThread(LPVOID lpParam) {
             DebugWrite(L"[DEBUG] FindAltDataSetByLayerName hook created and enabled at %p\n", (void*)targetFn2);
         } else {
             DebugWrite(L"[DEBUG] FindAltDataSetByLayerName hook creation failed at %p\n", (void*)targetFn2);
+        }
+
+        uintptr_t targetFn3 = base + 0x712d10;
+        if (MH_CreateHook((LPVOID)targetFn3, (LPVOID)&hook_SearchSubtitle, (LPVOID*)&orig_SearchSubtitle) == MH_OK) {
+            MH_EnableHook((LPVOID)targetFn3);
+            DebugWrite(L"[DEBUG] SearchSubtitle hook created and enabled at %p\n", (void*)targetFn3);
+        } else {
+            DebugWrite(L"[DEBUG] SearchSubtitle hook creation failed at %p\n", (void*)targetFn3);
+        }
+
+        // FName::ToString hook: substitute the translated text for runtime subtitle
+        // cue names so the display never falls back to the raw cue key.
+        uintptr_t targetFn4 = base + 0xb30120;
+        if (MH_CreateHook((LPVOID)targetFn4, (LPVOID)&hook_FNameToString, (LPVOID*)&orig_FNameToString) == MH_OK) {
+            MH_EnableHook((LPVOID)targetFn4);
+            DebugWrite(L"[DEBUG] FNameToString hook created and enabled at %p\n", (void*)targetFn4);
+        } else {
+            DebugWrite(L"[DEBUG] FNameToString hook creation failed at %p\n", (void*)targetFn4);
         }
     }
     return 0;

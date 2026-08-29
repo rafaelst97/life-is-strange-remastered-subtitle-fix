@@ -1,4 +1,4 @@
-# Life is Strange Remastered — Subtitle Fix Mod (v2)
+# Life is Strange Remastered — Subtitle Fix Mod (v2.1)
 
 This mod fixes the subtitle failure bug in *Life is Strange Remastered* on PC,
 where subtitles stop working after a scene or episode transition and the raw
@@ -24,7 +24,7 @@ Inside the game, subtitles are resolved by the `UDNEAltData` subsystem:
 
 ## What this mod does
 
-This package ships a native proxy DLL (`XINPUT1_3.dll`) that installs two
+This package ships a native proxy DLL (`XINPUT1_3.dll`) that installs four
 runtime hooks in the game engine:
 
 1. **`GetSubtitleText` interceptor** — resolves every subtitle cue against an
@@ -38,9 +38,19 @@ runtime hooks in the game engine:
    not loaded, the engine now receives the first loaded dataset instead of
    `NULL`. Because every `.cue` file ships the consolidated master database,
    the native engine lookup also succeeds as a second line of defense.
+3. **`SearchSubtitle` FName normalization** *(new in v2.1)* — this is what was
+   still breaking the start of Episode 2: the runtime cue `FName` sometimes
+   carries a Blueprint instance suffix (`_C_<number>`) that never matches a
+   dataset key. This hook strips that suffix before the engine's own
+   hash-table lookup runs, so it succeeds on the first try.
+4. **Display-time text substitution** *(new in v2.1)* — as a last line of
+   defense, the exact call the subtitle widget uses to turn a cue name into
+   on-screen text is hooked too, so an unresolved cue is still replaced with
+   the correct translated line before it is drawn.
 
-Result: subtitles no longer break after scene/episode transitions, and you
-never have to switch the language in the menu to fix them again.
+Result: subtitles no longer break after scene/episode transitions — including
+the Episode 2 opening — and you never have to switch the language in the menu
+to fix them again.
 
 ## What it does NOT do
 
@@ -91,9 +101,10 @@ A successful install logs entries like:
 [LiS_SubMod] DllMain ATTACH
 [DEBUG] GetSubtitleText hook created and enabled at ...
 [DEBUG] FindAltDataSetByLayerName hook created and enabled at ...
+[DEBUG] SearchSubtitle hook created and enabled at ...
+[DEBUG] FNameToString hook created and enabled at ...
 [INIT] SubtitleMap loaded: ... entries
 ```
-If some cue still fails to resolve, it is logged as `[HOOK] NO MATCH ...`.
 With this fix, subtitle cues resolve without needing any language change.
 
 ## What is NOT needed

@@ -1,4 +1,4 @@
-# Life is Strange Remastered — Mod de Correção de Legendas (v2)
+# Life is Strange Remastered — Mod de Correção de Legendas (v2.1)
 
 Este mod corrige o bug de legendas de *Life is Strange Remastered* no PC, em que
 as legendas quebram após uma troca de cenário ou episódio e, no lugar do texto,
@@ -25,7 +25,7 @@ Dentro do jogo, as legendas são resolvidas pelo subsistema `UDNEAltData`:
 
 ## O que este mod faz
 
-Este pacote traz uma DLL nativa de proxy (`XINPUT1_3.dll`) que instala dois
+Este pacote traz uma DLL nativa de proxy (`XINPUT1_3.dll`) que instala quatro
 hooks em tempo de execução no motor do jogo:
 
 1. **Interceptador de `GetSubtitleText`** — resolve cada cue de legenda contra
@@ -40,9 +40,21 @@ hooks em tempo de execução no motor do jogo:
    em vez de `NULL`. Como todo arquivo `.cue` traz o banco mestre consolidado,
    a busca nativa do motor também passa a funcionar como segunda linha de
    defesa.
+3. **Normalização de FName em `SearchSubtitle`** *(novo na v2.1)* — era isso
+   que ainda quebrava o começo do Episódio 2: o `FName` do cue em tempo de
+   execução às vezes carrega um sufixo de instância do Blueprint
+   (`_C_<número>`) que nunca bate com uma chave do dataset. Esse hook remove o
+   sufixo antes da busca na hash table do próprio motor, então ela já funciona
+   de primeira.
+4. **Substituição de texto na exibição** *(novo na v2.1)* — como última linha
+   de defesa, a chamada exata que o widget de legenda usa para transformar o
+   nome do cue em texto na tela também é interceptada, então um cue que não
+   resolveu ainda é trocado pela fala traduzida correta antes de ser
+   desenhado.
 
-Resultado: as legendas não quebram mais após trocas de cenário/episódio e você
-nunca mais precisa trocar o idioma no menu para consertá-las.
+Resultado: as legendas não quebram mais após trocas de cenário/episódio —
+incluindo a abertura do Episódio 2 — e você nunca mais precisa trocar o
+idioma no menu para consertá-las.
 
 ## O que ele NÃO faz
 
@@ -94,9 +106,10 @@ Uma instalação bem-sucedida registra linhas como:
 [LiS_SubMod] DllMain ATTACH
 [DEBUG] GetSubtitleText hook created and enabled at ...
 [DEBUG] FindAltDataSetByLayerName hook created and enabled at ...
+[DEBUG] SearchSubtitle hook created and enabled at ...
+[DEBUG] FNameToString hook created and enabled at ...
 [INIT] SubtitleMap loaded: ... entries
 ```
-Se algum cue ainda falhar, ele é registrado como `[HOOK] NO MATCH ...`.
 Com esta correção, os cues de legenda são resolvidos sem precisar trocar de
 idioma.
 
