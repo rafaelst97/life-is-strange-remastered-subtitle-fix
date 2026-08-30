@@ -21,7 +21,10 @@ This mod utilizes a custom XINPUT1_3.dll proxy to inject code directly into the 
 3. Run uild_dll.bat inside the src folder.
 
 ## Installation for Players
-See the releases page for the compiled .zip file, which requires a simple copy-paste of the Binaries folder into your game's installation directory. No game files are modified or overwritten.
+**[📥 CLICK HERE TO DOWNLOAD THE COMPILED .ZIP FILE](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
+*(or visit the [Releases page](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
+
+Installation requires a simple copy-paste of the Binaries folder inside the .zip into your game's installation directory. No game files are modified or overwritten.
 
 <br><hr><br>
 
@@ -43,7 +46,10 @@ Este mod utiliza um proxy personalizado XINPUT1_3.dll para injetar código diret
 3. **Injeção Dinâmica**: Quando a engine falha, a DLL intercepta, puxa a tradução do nosso dicionário, aloca um buffer válido da engine (sequestrando uma string gigante como o Aviso de Epilepsia) e injeta o texto na tela.
 
 ## Instalação para Jogadores
-Consulte a página de releases para obter o arquivo .zip compilado. A instalação requer apenas copiar a pasta Binaries para o diretório do jogo.
+**[📥 CLIQUE AQUI PARA BAIXAR O MOD (ARQUIVO .ZIP)](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
+*(ou visite a [página de Releases](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
+
+A instalação requer apenas copiar a pasta Binaries que está dentro do .zip para o diretório do seu jogo.
 
 <br><hr><br>
 
@@ -55,6 +61,12 @@ Este repositorio contiene el código fuente de la corrección definitiva de subt
 
 La solución utiliza XINPUT1_3.dll (vía MinHook) para leer directamente los textos desde los archivos originales y sobrescribir un espacio de memoria válido en el motor del juego en tiempo real, admitiendo todos los idiomas dinámicamente según el archivo Game.ini.
 
+## Instalación para Jugadores
+**[📥 HAGA CLIC AQUÍ PARA DESCARGAR EL ARCHIVO .ZIP](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
+*(o visite la [página de Lanzamientos](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
+
+Solo necesita copiar la carpeta Binaries que está dentro del .zip al directorio de su juego.
+
 <br><hr><br>
 
 <!-- ==================== Français ==================== -->
@@ -64,6 +76,12 @@ La solución utiliza XINPUT1_3.dll (vía MinHook) para leer directamente los tex
 Ce dépôt contient le code source de la correction définitive des sous-titres pour *Life is Strange Remastered*. Le mod corrige l'échec de chargement des fichiers .cue que la version remasterisée ignore lors des changements de zones.
 
 La solution utilise XINPUT1_3.dll (via MinHook) pour lire directement les textes depuis les fichiers originaux et écraser un espace mémoire valide dans le moteur de jeu en temps réel, supportant dynamiquement toutes les langues via Game.ini.
+
+## Installation pour les Joueurs
+**[📥 CLIQUEZ ICI POUR TÉLÉCHARGER LE FICHIER .ZIP](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
+*(ou visitez la [page des Versions](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
+
+Il vous suffit de copier le dossier Binaries présent dans le .zip vers le répertoire de votre jeu.
 
 <br><hr><br>
 
@@ -75,6 +93,12 @@ Dieses Repository enthält den Quellcode für die ultimative Untertitel-Korrektu
 
 Die Lösung verwendet XINPUT1_3.dll (via MinHook), um Texte direkt aus den Originaldateien zu lesen und den Speicher der Engine in Echtzeit zu überschreiben, wobei alle Sprachen dynamisch unterstützt werden.
 
+## Installation für Spieler
+**[📥 KLICKEN SIE HIER, UM DIE .ZIP-DATEI HERUNTERZULADEN](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
+*(oder besuchen Sie die [Releases-Seite](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
+
+Sie müssen lediglich den Ordner Binaries aus der .zip-Datei in Ihr Spielverzeichnis kopieren.
+
 <br><hr><br>
 
 <!-- ==================== Italiano ==================== -->
@@ -84,6 +108,12 @@ Die Lösung verwendet XINPUT1_3.dll (via MinHook), um Texte direkt aus den Origi
 Questo repository contiene il codice sorgente per la correzione definitiva dei sottotitoli. La mod risolve l'errore di caricamento dei file .cue che la versione rimasterizzata ignora durante i cambi di zona.
 
 La soluzione utilizza XINPUT1_3.dll (tramite MinHook) per leggere direttamente i testi e sovrascrivere la memoria del motore in tempo reale, supportando tutte le lingue.
+
+## Installazione per i Giocatori
+**[📥 CLICCA QUI PER SCARICARE IL FILE .ZIP](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
+*(o visita la [pagina delle Release](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
+
+Basta copiare la cartella Binaries contenuta nel .zip nella directory del gioco.
 
 <br><hr><br>
 
@@ -95,6 +125,12 @@ La soluzione utilizza XINPUT1_3.dll (tramite MinHook) per leggere direttamente i
 
 Решение использует XINPUT1_3.dll для прямого чтения текстов из файлов и перезаписи памяти движка в реальном времени, поддерживая все языки.
 
+## Установка для игроков
+**[📥 НАЖМИТЕ ЗДЕСЬ, ЧТОБЫ СКАЧАТЬ ФАЙЛ .ZIP](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
+*(или посетите [страницу Релизов](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
+
+Вам просто нужно скопировать папку Binaries из .zip в каталог вашей игры.
+
 <br><hr><br>
 
 <!-- ==================== 简体中文 ==================== -->
@@ -105,6 +141,12 @@ La soluzione utilizza XINPUT1_3.dll (tramite MinHook) per leggere direttamente i
 
 该解决方案使用 XINPUT1_3.dll（通过 MinHook）直接从原始文件中读取文本，并实时覆盖引擎内存，动态支持所有语言。
 
+## 玩家安装方法
+**[📥 点击此处下载编译好的 .ZIP 文件](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
+*(或访问 [发布页面](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
+
+只需将 .zip 文件中的 Binaries 文件夹复制到您的游戏目录即可。
+
 <br><hr><br>
 
 <!-- ==================== 日本語 ==================== -->
@@ -114,4 +156,10 @@ La soluzione utilizza XINPUT1_3.dll (tramite MinHook) per leggere direttamente i
 このリポジトリには、『Life is Strange Remastered』の字幕修正のソースコードが含まれています。このMODは、ゾーン変更時にリマスター版が無視する .cue ファイルの読み込みエラーを修正します。
 
 このソリューションは XINPUT1_3.dll を使用して、ファイルから直接テキストを読み取り、リアルタイムでエンジンのメモリを上書きし、すべての言語を動的にサポートします。
+
+## プレイヤー向けのインストール
+**[📥 .ZIPファイルをダウンロードするにはここをクリック](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
+*(または[リリースページ](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest)にアクセス)*
+
+.zip 内の Binaries フォルダをゲームディレクトリにコピーするだけです。
 
