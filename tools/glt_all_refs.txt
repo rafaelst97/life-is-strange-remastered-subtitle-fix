@@ -1,0 +1,121 @@
+0x140768034  call       0x140383380                              CALL RVA 0x383380
+0x140768076  call       0x140a356c0                              CALL RVA 0xa356c0
+0x1407680c8  call       0x140a1bad0                              CALL RVA 0xa1bad0
+0x1407681cf  call       0x14070a510                              CALL RVA 0x70a510
+0x140768246  call       0x140383380                              CALL RVA 0x383380
+0x1407682aa  call       0x140385c90                              CALL RVA 0x385c90
+0x1407682ba  call       0x14077ddf0                              CALL RVA 0x77ddf0
+0x1407682da  call       0x140688fe0                              CALL RVA 0x688fe0
+0x1407682ea  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140768311  call       0x140385c90                              CALL RVA 0x385c90
+0x140768321  call       0x14077ddf0                              CALL RVA 0x77ddf0
+0x140768341  call       0x140688fe0                              CALL RVA 0x688fe0
+0x140768351  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x1407683d9  lea        rdx, [rip + 0x22d5b20]                   STR L"Cue"
+0x1407683e8  call       0x140a3d330                              CALL RVA 0xa3d330
+0x140768497  lea        rdx, [rip + 0x22d5a6a]                   STR L"Act"
+0x1407684a6  call       0x140a3d330                              CALL RVA 0xa3d330
+0x1407685e9  lea        rdx, [rip + 0x22d5920]                   STR L"CU_%s_%s"
+0x1407685f8  call       0x140a1d0d0                              CALL RVA 0xa1d0d0
+0x140768610  call       0x140688fe0                              CALL RVA 0x688fe0
+0x140768620  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x1407689b5  call       0x140383380                              CALL RVA 0x383380
+0x1407689fa  call       0x140a356c0                              CALL RVA 0xa356c0
+0x140768a85  call       qword ptr [rip + 0x21e2a05]              STR L"φÉ╕═Ü"
+0x140768a9d  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140768b09  lea        rdx, [rip + 0x22d5418]                   STR L"Episode0%d__%s"
+0x140768b18  call       0x140a1d0d0                              CALL RVA 0xa1d0d0
+0x140768b30  call       0x140688fe0                              CALL RVA 0x688fe0
+0x140768b40  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140768bcb  lea        rdx, [rip + 0x22d5376]                   STR L"GEN"
+0x140768bda  call       0x140a3d330                              CALL RVA 0xa3d330
+0x140768c0b  lea        rax, [rip + 0x22d533e]                   STR L"CU_GEN_Max"
+0x140768d55  call       0x140383380                              CALL RVA 0x383380
+0x140768d9a  call       0x140a356c0                              CALL RVA 0xa356c0
+0x140768db2  call       0x140688fe0                              CALL RVA 0x688fe0
+0x140768dc2  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140768e0e  call       0x140385c90                              CALL RVA 0x385c90
+0x140768f28  call       0x1403852d0                              CALL RVA 0x3852d0
+0x140768fe3  call       0x140383380                              CALL RVA 0x383380
+0x140769084  call       0x140684440                              CALL RVA 0x684440
+0x140769094  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140769099  lea        rax, [rip + 0x22d4ec8]                   STR L"Cues"
+0x1407690e0  call       0x140684440                              CALL RVA 0x684440
+0x1407691a0  call       0x140385050                              CALL RVA 0x385050
+0x14076925b  call       0x140383380                              CALL RVA 0x383380
+0x1407692fc  call       0x140684440                              CALL RVA 0x684440
+0x14076930c  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140769358  call       0x140684440                              CALL RVA 0x684440
+0x140769418  call       0x140385050                              CALL RVA 0x385050
+0x1407694d3  call       0x140383380                              CALL RVA 0x383380
+0x140769574  call       0x140684440                              CALL RVA 0x684440
+0x140769584  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x1407695c1  call       0x140684440                              CALL RVA 0x684440
+0x140769681  call       0x140385050                              CALL RVA 0x385050
+0x14076973c  call       0x140383380                              CALL RVA 0x383380
+0x1407697dd  call       0x140684440                              CALL RVA 0x684440
+0x1407697ed  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140769802  call       0x140688fe0                              CALL RVA 0x688fe0
+0x140769812  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140769822  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140769832  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140769842  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140769864  call       0x140385c90                              CALL RVA 0x385c90
+0x140769874  call       0x14077ddf0                              CALL RVA 0x77ddf0
+0x140769894  call       0x140688fe0                              CALL RVA 0x688fe0
+0x1407698a4  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140769c4f  call       0x140383380                              CALL RVA 0x383380
+0x140769c94  call       0x140a356c0                              CALL RVA 0xa356c0
+0x140769d26  call       0x140a3d330                              CALL RVA 0xa3d330
+0x140769d98  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140769dbb  lea        rdx, [rip + 0x22d41b6]                   STR L"__Diary_"
+0x140769dc7  call       0x140a1a060                              CALL RVA 0xa1a060
+0x140769dfd  lea        r9, [rip + 0x22d418c]                    STR L"_Diary_"
+0x140769e04  lea        r8, [rip + 0x22d4195]                    STR L"__Diary_"
+0x140769e18  call       0x140a1ed30                              CALL RVA 0xa1ed30
+0x140769e35  call       0x140688fe0                              CALL RVA 0x688fe0
+0x140769e45  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x140769e71  call       0x140385c90                              CALL RVA 0x385c90
+0x140769e81  call       0x14077ddf0                              CALL RVA 0x77ddf0
+0x140769ea1  call       0x140688fe0                              CALL RVA 0x688fe0
+0x140769eb1  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x14076a286  call       0x140383380                              CALL RVA 0x383380
+0x14076a2cb  call       0x140a356c0                              CALL RVA 0xa356c0
+0x14076a356  call       qword ptr [rip + 0x21e1134]              STR L"φÉ╕═Ü"
+0x14076a36e  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x14076a3d4  lea        rdx, [rip + 0x22d3bdd]                   STR L"Episode0%d__%s"
+0x14076a3e3  call       0x140a1d0d0                              CALL RVA 0xa1d0d0
+0x14076a3f8  call       0x140688fe0                              CALL RVA 0x688fe0
+0x14076a408  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x14076a42a  call       0x140385c90                              CALL RVA 0x385c90
+0x14076a43a  call       0x14077ddf0                              CALL RVA 0x77ddf0
+0x14076a45a  call       0x140688fe0                              CALL RVA 0x688fe0
+0x14076a46a  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x14076a485  lea        rdx, [rip + 0x22d3b4c]                   STR L"_Settings_Settings_"
+0x14076a491  call       0x140a1a060                              CALL RVA 0xa1a060
+0x14076a4c7  lea        r9, [rip + 0x22d3b32]                    STR L"_Settings_"
+0x14076a4ce  lea        r8, [rip + 0x22d3b43]                    STR L"_Settings_Settings_"
+0x14076a4e2  call       0x140a1ed30                              CALL RVA 0xa1ed30
+0x14076a4ff  call       0x140688fe0                              CALL RVA 0x688fe0
+0x14076a50f  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x14076a531  call       0x140385c90                              CALL RVA 0x385c90
+0x14076a541  call       0x14077ddf0                              CALL RVA 0x77ddf0
+0x14076a561  call       0x140688fe0                              CALL RVA 0x688fe0
+0x14076a571  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x14076a5d6  call       0x1406890b0                              CALL RVA 0x6890b0
+0x14076a5e0  call       0x14071b8e0                              CALL RVA 0x71b8e0
+0x14076a64d  lea        rdx, [rip + 0x22d39ec]                   STR L"Episode0%d__%s"
+0x14076a65c  call       0x140a1d0d0                              CALL RVA 0xa1d0d0
+0x14076a671  call       0x140688fe0                              CALL RVA 0x688fe0
+0x14076a681  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x14076a6a3  call       0x140385c90                              CALL RVA 0x385c90
+0x14076a6b3  call       0x14077ddf0                              CALL RVA 0x77ddf0
+0x14076a6d3  call       0x140688fe0                              CALL RVA 0x688fe0
+0x14076a6e3  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x14076a748  call       0x1406890b0                              CALL RVA 0x6890b0
+0x14076a851  call       0x140392b60                              CALL RVA 0x392b60
+0x14076a8c8  call       0x140383380                              CALL RVA 0x383380
+0x14076aa23  call       0x140385ee0                              CALL RVA 0x385ee0
+0x14076aa30  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x14076aa40  call       0x1404d45c0                              CALL RVA 0x4d45c0
+0x14076aa50  call       0x1404d45c0                              CALL RVA 0x4d45c0

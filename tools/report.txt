@@ -1,0 +1,701 @@
+
+=== 1. Subtitle References ===
+
+--- Search results for 'subtitle' (wide) ---
+0x142a1a968: SubtitlesTrack (xrefs: 6)
+  -> xref from 0x1401bfe1d
+  -> xref from 0x1401c0223
+  -> xref from 0x14067c241
+0x142a31750: CMD_CHANGESUBTITLESCUTSCENES (xrefs: 2)
+  -> xref from 0x1401c42bd
+  -> xref from 0x1401c42bb
+0x142a317b8: CMD_CHANGESUBTITLELANGUAGE (xrefs: 2)
+  -> xref from 0x1401c425d
+  -> xref from 0x1401c425b
+0x142a31838: CMD_CHANGESUBTITLES (xrefs: 2)
+  -> xref from 0x1401c428d
+  -> xref from 0x1401c428b
+0x142a31a28: CMD_SUBTITLELANG (xrefs: 2)
+  -> xref from 0x1401c52ad
+  -> xref from 0x1401c52ab
+0x142a31a50: CMD_SUBTITLESIZE (xrefs: 2)
+  -> xref from 0x1401c530d
+  -> xref from 0x1401c530b
+0x142a31a78: CMD_SUBTITLELETTERBOXING (xrefs: 2)
+  -> xref from 0x1401c52dd
+  -> xref from 0x1401c52db
+0x142a3c076: nDisplayFakeSubtitle (xrefs: 0)
+0x142a40ff0: CMD_CHANGESUBTITLESCUTSCENES (xrefs: 2)
+  -> xref from 0x1401c673d
+  -> xref from 0x1401c673b
+0x142a41058: CMD_CHANGESUBTITLELANGUAGE (xrefs: 2)
+  -> xref from 0x1401c66dd
+  -> xref from 0x1401c66db
+0x142a410d8: CMD_CHANGESUBTITLES (xrefs: 2)
+  -> xref from 0x1401c670d
+  -> xref from 0x1401c670b
+0x142a412c8: CMD_SUBTITLELANG (xrefs: 2)
+  -> xref from 0x1401c772d
+  -> xref from 0x1401c772b
+0x142a412f0: CMD_SUBTITLESIZE (xrefs: 2)
+  -> xref from 0x1401c778d
+  -> xref from 0x1401c778b
+0x142a41318: CMD_SUBTITLELETTERBOXING (xrefs: 2)
+  -> xref from 0x1401c775d
+  -> xref from 0x1401c775b
+0x142a49610: CMD_CHANGESUBTITLESCUTSCENES (xrefs: 2)
+  -> xref from 0x1401c87fd
+  -> xref from 0x1401c87fb
+0x142a49678: CMD_CHANGESUBTITLELANGUAGE (xrefs: 2)
+  -> xref from 0x1401c879d
+  -> xref from 0x1401c879b
+0x142a496f8: CMD_CHANGESUBTITLES (xrefs: 2)
+  -> xref from 0x1401c87cd
+  -> xref from 0x1401c87cb
+0x142a498f8: CMD_SUBTITLELANG (xrefs: 2)
+  -> xref from 0x1401c97ed
+  -> xref from 0x1401c97eb
+0x142a49920: CMD_SUBTITLESIZE (xrefs: 2)
+  -> xref from 0x1401c984d
+  -> xref from 0x1401c984b
+0x142a49948: CMD_SUBTITLELETTERBOXING (xrefs: 2)
+  -> xref from 0x1401c981d
+  -> xref from 0x1401c981b
+0x142a55118: CMD_CHANGESUBTITLESCUTSCENES (xrefs: 2)
+  -> xref from 0x1401cea6d
+  -> xref from 0x1401cea6b
+0x142a55180: CMD_CHANGESUBTITLELANGUAGE (xrefs: 2)
+  -> xref from 0x1401cea0d
+  -> xref from 0x1401cea0b
+0x142a55260: CMD_CHANGESUBTITLES (xrefs: 2)
+  -> xref from 0x1401cea3d
+  -> xref from 0x1401cea3b
+0x142a55f80: CMD_SUBTITLELANG (xrefs: 2)
+  -> xref from 0x1401cfa5d
+  -> xref from 0x1401cfa5b
+0x142a55fa8: CMD_SUBTITLESIZE (xrefs: 2)
+  -> xref from 0x1401cfabd
+  -> xref from 0x1401cfabb
+0x142a55fd0: CMD_SUBTITLELETTERBOXING (xrefs: 2)
+  -> xref from 0x1401cfa8d
+  -> xref from 0x1401cfa8b
+0x142a5f330: CMD_CHANGESUBTITLESCUTSCENES (xrefs: 2)
+  -> xref from 0x1401d156d
+  -> xref from 0x1401d156b
+0x142a5f398: CMD_CHANGESUBTITLELANGUAGE (xrefs: 2)
+  -> xref from 0x1401d150d
+  -> xref from 0x1401d150b
+0x142a5f418: CMD_CHANGESUBTITLES (xrefs: 2)
+  -> xref from 0x1401d153d
+  -> xref from 0x1401d153b
+0x142a5f698: CMD_SUBTITLELANG (xrefs: 2)
+  -> xref from 0x1401d255d
+  -> xref from 0x1401d255b
+0x142a5f6c0: CMD_SUBTITLESIZE (xrefs: 2)
+  -> xref from 0x1401d25bd
+  -> xref from 0x1401d25bb
+0x142a5f6e8: CMD_SUBTITLELETTERBOXING (xrefs: 2)
+  -> xref from 0x1401d258d
+  -> xref from 0x1401d258b
+0x142a6c608: CMD_CHANGESUBTITLESCUTSCENES (xrefs: 2)
+  -> xref from 0x1401d429d
+  -> xref from 0x1401d429b
+0x142a6c670: CMD_CHANGESUBTITLELANGUAGE (xrefs: 2)
+  -> xref from 0x1401d423d
+  -> xref from 0x1401d423b
+0x142a6c6f0: CMD_CHANGESUBTITLES (xrefs: 2)
+  -> xref from 0x1401d426d
+  -> xref from 0x1401d426b
+0x142a6c8e0: CMD_SUBTITLELANG (xrefs: 2)
+  -> xref from 0x1401d528d
+  -> xref from 0x1401d528b
+0x142a6c908: CMD_SUBTITLESIZE (xrefs: 2)
+  -> xref from 0x1401d52ed
+  -> xref from 0x1401d52eb
+0x142a6c930: CMD_SUBTITLELETTERBOXING (xrefs: 2)
+  -> xref from 0x1401d52bd
+  -> xref from 0x1401d52bb
+0x142a6fae0: %s/Movies/Subtitles/ (xrefs: 2)
+  -> xref from 0x140938389
+  -> xref from 0x140938387
+0x142adbd68: SubtitleStruct (xrefs: 2)
+  -> xref from 0x1409cce5d
+  -> xref from 0x1409cce5b
+0x142adbd88: SubtitleStruct (xrefs: 4)
+  -> xref from 0x140222143
+  -> xref from 0x14022219a
+  -> xref from 0x140222141
+0x142adc3b0: ULiSCutsceneSubtitleWidget (xrefs: 2)
+  -> xref from 0x1402207c9
+  -> xref from 0x1402207c7
+0x142adc400: ULiSCutsceneSubtitleWidget (xrefs: 2)
+  -> xref from 0x1409cbc58
+  -> xref from 0x1409cbc56
+0x142adc438: ULiSCutsceneSubtitleWidget (xrefs: 4)
+  -> xref from 0x1402223b3
+  -> xref from 0x14022241c
+  -> xref from 0x1402223b1
+0x142adf160: SubtitleStruct (xrefs: 2)
+  -> xref from 0x1409c8934
+  -> xref from 0x1409c8932
+0x142afd918: ClearSubtitlesImplementable (xrefs: 2)
+  -> xref from 0x14024001d
+  -> xref from 0x14024001b
+0x142afd950: UpdateSubtitlesImplementable (xrefs: 2)
+  -> xref from 0x14024004d
+  -> xref from 0x14024004b
+0x142afdba6: sULiSSubtitlesWidget (xrefs: 0)
+0x142afdbd0: ULiSSubtitlesWidget (xrefs: 2)
+  -> xref from 0x1409fb1a8
+  -> xref from 0x1409fb1a6
+0x142afdbf8: ULiSSubtitlesWidget (xrefs: 4)
+  -> xref from 0x140241093
+  -> xref from 0x1402410fc
+  -> xref from 0x140241091
+0x142ef8c20: If 1, the photography system will attempt to automatically disable HUD, subtitles, and some standard (xrefs: 2)
+  -> xref from 0x1403178a2
+  -> xref from 0x1403178a0
+0x142f32e28: _Subtitle (xrefs: 2)
+  -> xref from 0x14031db2c
+  -> xref from 0x14031db2a
+0x143031430: SubtitleCue (xrefs: 6)
+  -> xref from 0x140350f4d
+  -> xref from 0x140352693
+  -> xref from 0x141fa248d
+
+=== 2. Localization References ===
+
+--- Search results for 'locali' (wide) ---
+0x142a3dc98: %s/Packages/Localization/%s (xrefs: 3)
+  -> xref from 0x1407778f4
+  -> xref from 0x1414f2453
+  -> xref from 0x1407778f2
+0x142a3dce0: %s/Packages/Localization/%s/%s.ini (xrefs: 2)
+  -> xref from 0x140777fd1
+  -> xref from 0x140777fcf
+0x142a52a90: HitBoneNameLocalized (xrefs: 2)
+  -> xref from 0x1401cc97d
+  -> xref from 0x1401cc97b
+0x142aed598: ULiSLocalizationManager (xrefs: 2)
+  -> xref from 0x140239b89
+  -> xref from 0x140239b87
+0x142aed5c8: ULiSLocalizationManager (xrefs: 2)
+  -> xref from 0x1409e5fa8
+  -> xref from 0x1409e5fa6
+0x142aed5f8: ULiSLocalizationManager (xrefs: 4)
+  -> xref from 0x14023b4e3
+  -> xref from 0x14023b54c
+  -> xref from 0x14023b4e1
+0x142aed788: ULiSLocalizedSet (xrefs: 2)
+  -> xref from 0x140239c09
+  -> xref from 0x140239c07
+0x142aed7d0: ULiSLocalizedSet (xrefs: 2)
+  -> xref from 0x1409e6068
+  -> xref from 0x1409e6066
+0x142aed7f8: ULiSLocalizedSet (xrefs: 4)
+  -> xref from 0x14023b583
+  -> xref from 0x14023b5ec
+  -> xref from 0x14023b581
+0x142b22240: Defines the eye adaptation quality which allows to adjust for quality or performance.
+<=0: off (fast (xrefs: 2)
+  -> xref from 0x1402516e2
+  -> xref from 0x1402516e0
+0x142b222ec: <=0: off (fastest)
+  1: low quality (e.g. non histogram based, not yet implemented)
+  2: normal qual (xrefs: 0)
+0x142b22312:   1: low quality (e.g. non histogram based, not yet implemented)
+  2: normal quality (default)
+  3:  (xrefs: 0)
+0x142b22394:   2: normal quality (default)
+  3: high quality (e.g. screen position localized, not yet implemented (xrefs: 0)
+0x142b223d0:   3: high quality (e.g. screen position localized, not yet implemented) (xrefs: 1)
+  -> xref from 0x141e19e73
+0x142b2a4e0: Localization.HangulTextWrappingMethod (xrefs: 2)
+  -> xref from 0x140253a67
+  -> xref from 0x140253a65
+0x142b2bb00: ShouldUseLocalizedPropertyNames (xrefs: 4)
+  -> xref from 0x140a7227b
+  -> xref from 0x140a722af
+  -> xref from 0x140a72279
+0x142b32820: LEETIFYUnlocalized (xrefs: 2)
+  -> xref from 0x140aafc99
+  -> xref from 0x140aafc97
+0x142b33b06: eShouldUseLocalizedNumericInput (xrefs: 0)
+0x142b392a8: bRestrictLocalization (xrefs: 2)
+  -> xref from 0x140acdaf9
+  -> xref from 0x140acdaf7
+0x142b3cb50: LocalizationPaths (xrefs: 6)
+  -> xref from 0x140af7e40
+  -> xref from 0x140af80a0
+  -> xref from 0x140af8520
+0x142b3cb80: ../../../Engine/Content/Localization/Engine (xrefs: 2)
+  -> xref from 0x140af8100
+  -> xref from 0x140af80fe
+0x142b3cbe0: ../../../Engine/Content/Localization/Editor (xrefs: 2)
+  -> xref from 0x140af7ea0
+  -> xref from 0x140af7e9e
+0x142b3cc38: PropertyNameLocalizationPaths (xrefs: 2)
+  -> xref from 0x140af9060
+  -> xref from 0x140af905e
+0x142b3cc80: ../../../Engine/Content/Localization/PropertyNames (xrefs: 2)
+  -> xref from 0x140af90c0
+  -> xref from 0x140af90be
+0x142b3cce8: ToolTipLocalizationPaths (xrefs: 2)
+  -> xref from 0x140af9900
+  -> xref from 0x140af98fe
+0x142b3cd20: ../../../Engine/Content/Localization/ToolTips (xrefs: 2)
+  -> xref from 0x140af9960
+  -> xref from 0x140af995e
+0x142b415e8: SoundCueLocalized (xrefs: 2)
+  -> xref from 0x140b2cab5
+  -> xref from 0x140b2cab3
+0x142b453f8: LocalizationDescriptor (xrefs: 6)
+  -> xref from 0x140b4d664
+  -> xref from 0x140b4da0f
+  -> xref from 0x140b5235b
+0x142b45430: Found a 'Localization Target' entry with a missing 'Name' field (xrefs: 2)
+  -> xref from 0x140b4da16
+  -> xref from 0x140b4da14
+0x142b45510: Localization Target entry '{0}' specified an unrecognized target LoadingPolicy '{1}' (xrefs: 2)
+  -> xref from 0x140b4d66e
+  -> xref from 0x140b4d66c
+0x142b45600: The 'Localization Targets' array has invalid contents and was not able to be loaded. (xrefs: 2)
+  -> xref from 0x140b52362
+  -> xref from 0x140b52360
+0x142b46250: LocalizationTargets (xrefs: 4)
+  -> xref from 0x140b4fa8f
+  -> xref from 0x140b57dfb
+  -> xref from 0x140b4fa8d
+0x142b47180: Localization (xrefs: 2)
+  -> xref from 0x140b48f95
+  -> xref from 0x140b48f93
+0x142b789f0: ELocalizedTextSourceCategory (xrefs: 4)
+  -> xref from 0x140260dd3
+  -> xref from 0x140ccd289
+  -> xref from 0x140260dd1
+0x142b8cc70: Enable the legacy localized fallback fonts? (0/1). (xrefs: 3)
+  -> xref from 0x140267312
+  -> xref from 0x142183f43
+  -> xref from 0x140267310
+0x142b8cce0: Slate.EnableLegacyLocalizedFallbackFont (xrefs: 2)
+  -> xref from 0x140267328
+  -> xref from 0x140267326
+0x142b8d280: Controls if we enable or disable localized layout, which affects left to right or right to left dete (xrefs: 2)
+  -> xref from 0x1402672a2
+  -> xref from 0x1402672a0
+0x142b8d370: Slate.EnableLayoutLocalization (xrefs: 2)
+  -> xref from 0x1402672b8
+  -> xref from 0x1402672b6
+0x142b8dd10: Culture for localization was changed (xrefs: 2)
+  -> xref from 0x140d68a1d
+  -> xref from 0x140d68a1b
+0x1430a3420: ClientReceiveLocalizedMessage (xrefs: 2)
+  -> xref from 0x1403687d9
+  -> xref from 0x1403687d7
+0x1430e2130: ULocalizedOverlays (xrefs: 4)
+  -> xref from 0x140375dc9
+  -> xref from 0x140375ee5
+  -> xref from 0x140375dc7
+
+=== 3. Fallback Pattern References ===
+
+--- Search results for '?%s?' (wide) ---
+
+=== 4. Disassemble Lipsync Getter 0x70fb40 ===
+0x14070fb40  mov                      qword ptr [rsp + 0x18], r8              
+0x14070fb45  mov                      qword ptr [rsp + 0x10], rdx             
+0x14070fb4a  mov                      qword ptr [rsp + 8], rcx                
+0x14070fb4f  push                     rsi                                     
+0x14070fb50  push                     rdi                                     
+0x14070fb51  sub                      rsp, 0x5f8                              
+0x14070fb58  mov                      rax, qword ptr [rip + 0x30ff209]          ; -> 0x14380ed68
+0x14070fb5f  xor                      rax, rsp                                
+0x14070fb62  mov                      qword ptr [rsp + 0x5e0], rax            
+0x14070fb6a  lea                      rdx, [rsp + 0x60]                       
+0x14070fb6f  lea                      rcx, [rsp + 0x618]                      
+0x14070fb77  call                     0x140b30120                             
+0x14070fb7c  lea                      rax, [rip + 0x2321fa5]                    ; -> 0x142a31b28
+0x14070fb83  mov                      qword ptr [rsp + 0x128], rax            
+0x14070fb8b  lea                      rax, [rsp + 0x2c0]                      
+0x14070fb93  mov                      qword ptr [rsp + 0x1a8], rax            
+0x14070fb9b  mov                      rax, qword ptr [rsp + 0x1a8]            
+0x14070fba3  mov                      qword ptr [rsp + 0x410], rax            
+0x14070fbab  mov                      rax, qword ptr [rsp + 0x410]            
+0x14070fbb3  mov                      qword ptr [rax], 0                      
+0x14070fbba  mov                      rax, qword ptr [rsp + 0x1a8]            
+0x14070fbc2  mov                      dword ptr [rax + 8], 0                  
+0x14070fbc9  mov                      rax, qword ptr [rsp + 0x1a8]            
+0x14070fbd1  mov                      dword ptr [rax + 0xc], 0                
+0x14070fbd8  cmp                      qword ptr [rsp + 0x128], 0              
+0x14070fbe1  je                       0x14070fd05                             
+0x14070fbe7  mov                      rax, qword ptr [rsp + 0x128]            
+0x14070fbef  movsx                    eax, byte ptr [rax]                     
+0x14070fbf2  test                     eax, eax                                
+0x14070fbf4  je                       0x14070fd05                             
+0x14070fbfa  mov                      rax, qword ptr [rsp + 0x128]            
+0x14070fc02  mov                      qword ptr [rsp + 0x418], rax            
+0x14070fc0a  mov                      qword ptr [rsp + 0x120], 0xffffffffffffffff
+0x14070fc16  inc                      qword ptr [rsp + 0x120]                 
+0x14070fc1e  mov                      rax, qword ptr [rsp + 0x418]            
+0x14070fc26  mov                      rcx, qword ptr [rsp + 0x120]            
+0x14070fc2e  cmp                      byte ptr [rax + rcx], 0                 
+0x14070fc32  jne                      0x14070fc16                             
+0x14070fc34  mov                      rax, qword ptr [rsp + 0x120]            
+0x14070fc3c  inc                      eax                                     
+0x14070fc3e  mov                      dword ptr [rsp + 0xd4], eax             
+0x14070fc45  mov                      eax, dword ptr [rsp + 0xd4]             
+0x14070fc4c  mov                      dword ptr [rsp + 0xd8], eax             
+0x14070fc53  lea                      rax, [rsp + 0x2c0]                      
+0x14070fc5b  mov                      qword ptr [rsp + 0xc8], rax             
+0x14070fc63  mov                      rax, qword ptr [rsp + 0xc8]             
+0x14070fc6b  mov                      eax, dword ptr [rax + 8]                
+0x14070fc6e  mov                      dword ptr [rsp + 0x130], eax            
+0x14070fc75  mov                      rax, qword ptr [rsp + 0xc8]             
+0x14070fc7d  mov                      ecx, dword ptr [rsp + 0xd8]             
+0x14070fc84  mov                      eax, dword ptr [rax + 8]                
+0x14070fc87  add                      eax, ecx                                
+0x14070fc89  mov                      dword ptr [rsp + 0xd0], eax             
+0x14070fc90  mov                      rax, qword ptr [rsp + 0xc8]             
+0x14070fc98  mov                      ecx, dword ptr [rsp + 0xd0]             
+0x14070fc9f  mov                      dword ptr [rax + 8], ecx                
+0x14070fca2  mov                      rax, qword ptr [rsp + 0xc8]             
+0x14070fcaa  mov                      eax, dword ptr [rax + 0xc]              
+0x14070fcad  cmp                      dword ptr [rsp + 0xd0], eax             
+0x14070fcb4  jle                      0x14070fcca                             
+
+
+=== 5. Disassemble FindOrLoadAltDataSet 0x7188a0 ===
+0x1407188a0  mov                      qword ptr [rsp + 0x18], r8              
+0x1407188a5  mov                      byte ptr [rsp + 0x10], dl               
+0x1407188a9  mov                      qword ptr [rsp + 8], rcx                
+0x1407188ae  sub                      rsp, 0x558                              
+0x1407188b5  mov                      rax, qword ptr [rip + 0x30f64ac]          ; -> 0x14380ed68
+0x1407188bc  xor                      rax, rsp                                
+0x1407188bf  mov                      qword ptr [rsp + 0x540], rax            
+0x1407188c7  movzx                    eax, byte ptr [rsp + 0x568]             
+0x1407188cf  test                     eax, eax                                
+0x1407188d1  jne                      0x1407188e9                             
+0x1407188d3  mov                      rax, qword ptr [rsp + 0x560]            
+0x1407188db  add                      rax, 0x68                               
+0x1407188df  mov                      qword ptr [rsp + 0x2a8], rax            
+0x1407188e7  jmp                      0x1407188fd                             
+0x1407188e9  mov                      rax, qword ptr [rsp + 0x560]            
+0x1407188f1  add                      rax, 0x78                               
+0x1407188f5  mov                      qword ptr [rsp + 0x2a8], rax            
+0x1407188fd  mov                      rax, qword ptr [rsp + 0x2a8]            
+0x140718905  mov                      qword ptr [rsp + 0x48], rax             
+0x14071890a  mov                      dword ptr [rsp + 0x50], 0               
+0x140718912  jmp                      0x14071891e                             
+0x140718914  mov                      eax, dword ptr [rsp + 0x50]             
+0x140718918  inc                      eax                                     
+0x14071891a  mov                      dword ptr [rsp + 0x50], eax             
+0x14071891e  mov                      rax, qword ptr [rsp + 0x48]             
+0x140718923  mov                      eax, dword ptr [rax + 8]                
+0x140718926  mov                      dword ptr [rsp + 0x200], eax            
+0x14071892d  mov                      eax, dword ptr [rsp + 0x200]            
+0x140718934  cmp                      dword ptr [rsp + 0x50], eax             
+0x140718938  jge                      0x140718a31                             
+0x14071893e  xor                      eax, eax                                
+0x140718940  mov                      rax, qword ptr [rsp + 0x48]             
+0x140718945  mov                      rax, qword ptr [rax]                    
+0x140718948  mov                      qword ptr [rsp + 0x3d8], rax            
+0x140718950  movsxd                   rax, dword ptr [rsp + 0x50]             
+0x140718955  imul                     rax, rax, 0x88                          
+0x14071895c  mov                      rcx, qword ptr [rsp + 0x3d8]            
+0x140718964  add                      rcx, rax                                
+0x140718967  mov                      rax, rcx                                
+0x14071896a  mov                      qword ptr [rsp + 0x2b0], rax            
+0x140718972  mov                      rax, qword ptr [rsp + 0x2b0]            
+0x14071897a  mov                      eax, dword ptr [rax + 4]                
+0x14071897d  mov                      dword ptr [rsp + 0x208], eax            
+0x140718984  mov                      eax, dword ptr [rsp + 0x574]            
+0x14071898b  mov                      dword ptr [rsp + 0x204], eax            
+0x140718992  mov                      eax, dword ptr [rsp + 0x204]            
+0x140718999  cmp                      dword ptr [rsp + 0x208], eax            
+0x1407189a0  jne                      0x1407189af                             
+0x1407189a2  mov                      dword ptr [rsp + 0xcc], 1               
+0x1407189ad  jmp                      0x1407189ba                             
+0x1407189af  mov                      dword ptr [rsp + 0xcc], 0               
+0x1407189ba  mov                      rax, qword ptr [rsp + 0x2b0]            
+0x1407189c2  mov                      ecx, dword ptr [rsp + 0x570]            
+0x1407189c9  cmp                      dword ptr [rax], ecx                    
+0x1407189cb  jne                      0x1407189da                             
+0x1407189cd  mov                      dword ptr [rsp + 0xc8], 1               
+0x1407189d8  jmp                      0x1407189e5                             
+0x1407189da  mov                      dword ptr [rsp + 0xc8], 0               
+0x1407189e5  movzx                    eax, byte ptr [rsp + 0xc8]              
+0x1407189ed  and                      eax, dword ptr [rsp + 0xcc]             
+0x1407189f4  movzx                    eax, al                                 
+0x1407189f7  test                     eax, eax                                
+0x1407189f9  je                       0x140718a2c                             
+0x1407189fb  xor                      eax, eax                                
+0x1407189fd  mov                      rax, qword ptr [rsp + 0x48]             
+0x140718a02  mov                      rax, qword ptr [rax]                    
+0x140718a05  mov                      qword ptr [rsp + 0x3f8], rax            
+0x140718a0d  movsxd                   rax, dword ptr [rsp + 0x50]             
+0x140718a12  imul                     rax, rax, 0x88                          
+0x140718a19  mov                      rcx, qword ptr [rsp + 0x3f8]            
+0x140718a21  add                      rcx, rax                                
+0x140718a24  mov                      rax, rcx                                
+0x140718a27  jmp                      0x140719cd4                             
+0x140718a2c  jmp                      0x140718914                             
+0x140718a31  lea                      rax, [rsp + 0x2c8]                      
+0x140718a39  mov                      qword ptr [rsp + 0x1c0], rax            
+0x140718a41  mov                      rax, qword ptr [rsp + 0x1c0]            
+0x140718a49  mov                      qword ptr [rsp + 0x400], rax            
+0x140718a51  mov                      rax, qword ptr [rsp + 0x400]            
+0x140718a59  mov                      qword ptr [rax], 0                      
+0x140718a60  mov                      rax, qword ptr [rsp + 0x1c0]            
+0x140718a68  mov                      dword ptr [rax + 8], 0                  
+0x140718a6f  mov                      rax, qword ptr [rsp + 0x1c0]            
+0x140718a77  mov                      dword ptr [rax + 0xc], 0                
+0x140718a7e  mov                      qword ptr [rsp + 0x118], 0              
+0x140718a8a  lea                      rax, [rsp + 0x428]                      
+0x140718a92  mov                      qword ptr [rsp + 0x1c8], rax            
+0x140718a9a  mov                      rax, qword ptr [rsp + 0x1c8]            
+0x140718aa2  mov                      qword ptr [rsp + 0x408], rax            
+0x140718aaa  mov                      rax, qword ptr [rsp + 0x408]            
+0x140718ab2  mov                      qword ptr [rax], 0                      
+0x140718ab9  mov                      rax, qword ptr [rsp + 0x1c8]            
+0x140718ac1  mov                      dword ptr [rax + 8], 0                  
+0x140718ac8  mov                      rax, qword ptr [rsp + 0x1c8]            
+0x140718ad0  mov                      dword ptr [rax + 0xc], 0                
+0x140718ad7  lea                      rax, [rsp + 0x100]                      
+0x140718adf  mov                      qword ptr [rsp + 0x1d0], rax            
+0x140718ae7  mov                      rax, qword ptr [rsp + 0x1d0]            
+0x140718aef  mov                      qword ptr [rsp + 0x410], rax            
+0x140718af7  mov                      rax, qword ptr [rsp + 0x410]            
+
+
+=== 6. INT and JPN References ===
+
+--- Search results for 'INT' (wide) ---
+
+--- Search results for 'JPN' (wide) ---
+
+=== 7. Cues References ===
+
+--- Search results for 'Cues' (wide) ---
+
+=== 9. .ini References ===
+
+--- Search results for '.ini' (wide) ---
+0x142a3dcd0: .ini (xrefs: 2)
+  -> xref from 0x140777cb5
+  -> xref from 0x140777cb3
+0x142a3dce0: %s/Packages/Localization/%s/%s.ini (xrefs: 2)
+  -> xref from 0x140777fd1
+  -> xref from 0x140777fcf
+0x142b1b358: CrashReportClient.ini (xrefs: 0)
+0x142b1b388: .ini (xrefs: 4)
+  -> xref from 0x14025041d
+  -> xref from 0x140afecd4
+  -> xref from 0x14025041b
+0x142b20e50: Setting this to 0 allows to ship a game with more optimized shaders as some
+editor and development f (xrefs: 2)
+  -> xref from 0x140250fd2
+  -> xref from 0x140250fd0
+0x142b20ee8: editor and development features are not longer compiled into the shaders.
+ Note: This should be done (xrefs: 0)
+0x142b20f7c:  Note: This should be done when shipping but it's not done automatically yet (feature need to mature (xrefs: 0)
+0x142b21046:        and shaders will compile slower as shader caching from development isn't shared).
+Cannot be c (xrefs: 0)
+0x142b210f8: Cannot be changed at runtime - can be put into BaseEngine.ini
+ 0: off, shader can run a bit faster
+  (xrefs: 0)
+0x142b282d0: ConsoleHistory.ini (xrefs: 4)
+  -> xref from 0x140a34cf3
+  -> xref from 0x140a39f6d
+  -> xref from 0x140a34cf1
+0x142b376f0: {ENGINE}Base.ini (xrefs: 2)
+  -> xref from 0x1402547fe
+  -> xref from 0x1402547fc
+0x142b37728: {ENGINE}{ED}{EF}Base{TYPE}.ini (xrefs: 2)
+  -> xref from 0x140254863
+  -> xref from 0x140254861
+0x142b37790: {ENGINE}{ED}{PLATFORM}/{EF}Base{PLATFORM}{TYPE}.ini (xrefs: 2)
+  -> xref from 0x1402548ba
+  -> xref from 0x1402548b8
+0x142b37800: {EXTENGINE}/{ED}{EF}Base{PLATFORM}{TYPE}.ini (xrefs: 2)
+  -> xref from 0x1402548f1
+  -> xref from 0x1402548ef
+0x142b37880: {PROJECT}{ED}{EF}Default{TYPE}.ini (xrefs: 2)
+  -> xref from 0x14025493f
+  -> xref from 0x14025493d
+0x142b378f0: {ENGINE}{ED}{PLATFORM}/{EF}{PLATFORM}{TYPE}.ini (xrefs: 2)
+  -> xref from 0x14025499c
+  -> xref from 0x14025499a
+0x142b37950: {EXTENGINE}/{ED}{EF}{PLATFORM}{TYPE}.ini (xrefs: 2)
+  -> xref from 0x1402549d3
+  -> xref from 0x1402549d1
+0x142b379d0: {PROJECT}{ED}{PLATFORM}/{EF}{PLATFORM}{TYPE}.ini (xrefs: 2)
+  -> xref from 0x140254a21
+  -> xref from 0x140254a1f
+0x142b37a40: {EXTPROJECT}/{ED}{EF}{PLATFORM}{TYPE}.ini (xrefs: 2)
+  -> xref from 0x140254a58
+  -> xref from 0x140254a56
+0x142b37ac0: {USERSETTINGS}Unreal Engine/Engine/Config/User{TYPE}.ini (xrefs: 2)
+  -> xref from 0x140254aa6
+  -> xref from 0x140254aa4
+0x142b37b50: {USER}Unreal Engine/Engine/Config/User{TYPE}.ini (xrefs: 3)
+  -> xref from 0x140254afd
+  -> xref from 0x14212edc1
+  -> xref from 0x140254afb
+0x142b37bd0: {PROJECT}User{TYPE}.ini (xrefs: 2)
+  -> xref from 0x140254b54
+  -> xref from 0x140254b52
+0x142b38c40: %s%s/%s.ini (xrefs: 6)
+  -> xref from 0x140acf7fc
+  -> xref from 0x140b47442
+  -> xref from 0x1417eb114
+0x142b38c90: '{0}' must exist and contain a DefaultEngine.ini. (xrefs: 2)
+  -> xref from 0x140ad42f8
+  -> xref from 0x140ad42f6
+0x142b38d38: %s/%s.ini (xrefs: 2)
+  -> xref from 0x140ad57d0
+  -> xref from 0x140ad57ce
+0x142b38d50: Config/ConsoleVariables.ini (xrefs: 2)
+  -> xref from 0x140ad550b
+  -> xref from 0x140ad5509
+0x142b38e20: Manifest.ini (xrefs: 2)
+  -> xref from 0x140adfcae
+  -> xref from 0x140adfcac
+0x142b38ed0: EditorSettings.ini (xrefs: 2)
+  -> xref from 0x140ae00f6
+  -> xref from 0x140ae00f4
+0x142b38ef8: EditorGameAgnostic.ini (xrefs: 2)
+  -> xref from 0x140ae0126
+  -> xref from 0x140ae0124
+0x142b38fc8: EditorLayout.ini (xrefs: 4)
+  -> xref from 0x140ae03a2
+  -> xref from 0x140ae03a9
+  -> xref from 0x140ae03a0
+0x142b38ff0: EditorKeyBindings.ini (xrefs: 4)
+  -> xref from 0x140ae03b5
+  -> xref from 0x140ae03bc
+  -> xref from 0x140ae03b3
+0x142b39220: DataDrivenPlatformInfo.ini (xrefs: 5)
+  -> xref from 0x140acf017
+  -> xref from 0x140acf061
+  -> xref from 0x142764a18
+0x142b3d2b0: %s/%s/%s/%s/%s.ini (xrefs: 2)
+  -> xref from 0x140af73e7
+  -> xref from 0x140af73e5
+0x142b3d2d8: _Local.ini (xrefs: 2)
+  -> xref from 0x140afee45
+  -> xref from 0x140afee43
+0x142b50900: Actor.InitialLifeSpan (xrefs: 2)
+  -> xref from 0x140bacf9f
+  -> xref from 0x140bacf9d
+0x142b56ae0: ProjectileMovementComponent.InitialSpeed (xrefs: 4)
+  -> xref from 0x140bd42d8
+  -> xref from 0x140c29170
+  -> xref from 0x140bd42d6
+0x142b639b0: FoliageType.InitialMaxAge (xrefs: 2)
+  -> xref from 0x140c39772
+  -> xref from 0x140c39770
+0x142b6b988: %s%s/Config/%s%s.ini (xrefs: 2)
+  -> xref from 0x140c73068
+  -> xref from 0x140c73066
+0x142b6b9b8: %s%s/%s%s.ini (xrefs: 3)
+  -> xref from 0x140c73193
+  -> xref from 0x1412b7104
+  -> xref from 0x140c73191
+0x142b6b9d8: %sDefault%s.ini (xrefs: 2)
+  -> xref from 0x140c732b4
+  -> xref from 0x140c732b2
+0x142b6ba00: %sUnreal Engine/Engine/Config/User%s.ini (xrefs: 2)
+  -> xref from 0x140c7d288
+  -> xref from 0x140c7d286
+0x142b6c830: Import failed for '%s': property is config (Check to see if the property is listed in the DefaultPro (xrefs: 2)
+  -> xref from 0x140c824df
+  -> xref from 0x140c824dd
+0x142c8b060: BuildPatchServicesLocal.ini (xrefs: 2)
+  -> xref from 0x1402e32c2
+  -> xref from 0x1402e32c0
+0x142ec03a0: DefaultGameplayTags.ini (xrefs: 2)
+  -> xref from 0x14180700d
+  -> xref from 0x14180700b
+0x142ec1068: *.ini (xrefs: 2)
+  -> xref from 0x141806503
+  -> xref from 0x141806501
+0x142f05800: Whether to ignore the first blocking overlap in SafeMoveUpdatedComponent (if moving out from object  (xrefs: 2)
+  -> xref from 0x140319212
+  -> xref from 0x140319210
+0x142f05904: The 'p.InitialOverlapTolerance' setting determines the 'move out' rules, but by default we always tr (xrefs: 0)
+0x142f06008: p.InitialOverlapTolerance (xrefs: 2)
+  -> xref from 0x140319148
+  -> xref from 0x140319146
+0x142f33a68: Deviceprofiles.ini (xrefs: 2)
+  -> xref from 0x141ab7d69
+  -> xref from 0x141ab7d67
+0x142fba1f0: Whether to keep shader reflection and debug data from shader bytecode, default is to strip.  When us (xrefs: 2)
+  -> xref from 0x140331242
+  -> xref from 0x140331240
+0x142fba420: Whether to export the shader reflection and debug data from shader bytecode as separate files.r.Shad (xrefs: 2)
+  -> xref from 0x140330ff2
+  -> xref from 0x140330ff0
+0x142fbf438: CloudStorage.ini (xrefs: 4)
+  -> xref from 0x141dc1abe
+  -> xref from 0x141dc9c3b
+  -> xref from 0x141dc1abc
+0x142fd9360: Allows to override a specific showflag (works in editor and game, "show" only works in game and UI o (xrefs: 2)
+  -> xref from 0x141eb4ed2
+  -> xref from 0x141eb4ed0
+0x142fd9446: Useful to run a build many time with the same showflags (when put in consolevariables.ini like "show (xrefs: 0)
+0x1430e8900: GameplayMediaEncoder.Initialize (xrefs: 2)
+  -> xref from 0x14037745c
+  -> xref from 0x14037745a
+
+=== 10. Culture References ===
+
+--- Search results for 'culture' (wide) ---
+0x142af0eb0: InitCulture (xrefs: 2)
+  -> xref from 0x14023a67d
+  -> xref from 0x14023a67b
+0x142b2b2c0: CultureMappings (xrefs: 2)
+  -> xref from 0x140a5f2e2
+  -> xref from 0x140a5f2e0
+0x142b2b2e0: EnabledCultures (xrefs: 2)
+  -> xref from 0x140a5f1fc
+  -> xref from 0x140a5f1fa
+0x142b2b300: DisabledCultures (xrefs: 2)
+  -> xref from 0x140a5f228
+  -> xref from 0x140a5f226
+0x142b31fb0: %s plural form argument modifier is redundant as this culture only has a single plural form (xrefs: 2)
+  -> xref from 0x140ab03d0
+  -> xref from 0x140ab03ce
+0x142b326a8: CULTURE= (xrefs: 4)
+  -> xref from 0x140a8f103
+  -> xref from 0x141ee1b29
+  -> xref from 0x140a8f101
+0x142b326c0: Internationalization.AssetGroupCultures (xrefs: 8)
+  -> xref from 0x140a8d507
+  -> xref from 0x141b87a6f
+  -> xref from 0x141ba3295
+0x142b32738: Culture (xrefs: 4)
+  -> xref from 0x140a8d833
+  -> xref from 0x141ba33bc
+  -> xref from 0x140a8d831
+0x142b32748: CULTUREFORCOOKING= (xrefs: 3)
+  -> xref from 0x140a8efcf
+  -> xref from 0x140fa4545
+  -> xref from 0x140a8efcd
+0x142b760f8: FText::AsCultureInvariant(
+ (xrefs: 2)
+  -> xref from 0x140cad728
+  -> xref from 0x140cad726
+0x142b8d280: Controls if we enable or disable localized layout, which affects left to right or right to left dete (xrefs: 2)
+  -> xref from 0x1402672a2
+  -> xref from 0x1402672a0
+0x142b8d3b0: Should we initially follow the culture's flow direction at the window level. (xrefs: 2)
+  -> xref from 0x1402673f2
+  -> xref from 0x1402673f0
+0x142b8d450: Slate.ShouldFollowCultureByDefault (xrefs: 2)
+  -> xref from 0x140267408
+  -> xref from 0x140267406
+0x142b8dd10: Culture for localization was changed (xrefs: 2)
+  -> xref from 0x140d68a1d
+  -> xref from 0x140d68a1b
+
+Done.

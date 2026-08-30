@@ -1,10 +1,11 @@
 @echo off
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
 
-cd /d "D:\Projetos\LiS_Remastered_Subtitle_Mod\src"
+cd /d "%~dp0"
 
-echo Compiling XINPUT1_3.dll with MinHook and Master Subtitles...
-cl.exe /O2 /MD /W3 /I. /Iminhook /LD ^
+echo Compiling XINPUT1_3.dll (XInput proxy + GetLocalizedText hook)...
+rem /MT: static CRT, so the shipped DLL has no VC++ redistributable dependency.
+cl.exe /nologo /O2 /MT /W3 /EHsc /std:c++17 /utf-8 /I. /Iminhook /LD ^
     xinput_proxy.cpp ^
     minhook/buffer.c ^
     minhook/hook.c ^
@@ -17,7 +18,5 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b %ERRORLEVEL%
 )
 
-echo [SUCCESS] XINPUT1_3.dll built successfully!
-copy /Y "XINPUT1_3.dll" "C:\Games\Life is Strange Remastered\LIS\Binaries\Win64\XINPUT1_3.dll"
-copy /Y "XINPUT1_3.dll" "D:\Projetos\LiS_Remastered_Subtitle_Mod\mod_package\Binaries\Win64\XINPUT1_3.dll"
-
+echo [SUCCESS] XINPUT1_3.dll built.
+copy /Y "XINPUT1_3.dll" "..\mod_package\Binaries\Win64\XINPUT1_3.dll"

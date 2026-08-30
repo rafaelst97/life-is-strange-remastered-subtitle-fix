@@ -1,148 +1,23 @@
-# Life is Strange Remastered - Subtitle Fix Mod (PC)
+# Life is Strange Remastered - Universal Subtitle Fix
 
-A high-performance native C++ mod that fixes the subtitle failure bug in
-*Life is Strange Remastered* on PC, where subtitles intermittently display raw
-internal audio-cue / file identifiers (such as `Cue_E5_7Z_..._C_2147222737`)
-instead of translated dialogue text after scene transitions, character switches
-or episode changes.
+This repository contains the source code for the definitive, universal subtitle fix for *Life is Strange Remastered*.
 
-**The fix works in every language the game offers.**
+## The Problem
+In the remastered version by Deck Nine, subtitles frequently break during scene transitions or episode changes, causing the game to display raw internal keys (e.g., Act_E2_1A_...) instead of the actual localized text, or simply displaying nothing.
 
----
-
-## The Issue
-
-In *Life is Strange Remastered*, subtitle loading is handled by the
-`UDNEAltData` subsystem in Unreal Engine 4:
-
-1. When an audio event triggers, `GetSubtitleText` resolves the level/sub-level
-   that owns the cue through `FindAltDataSetByLayerName`.
-2. When a scene is streamed in, its subtitle dataset is frequently not loaded
-   in memory yet, so the lookup returns `NULL` and the validator aborts early.
-3. When the lookup fails, the engine falls back to rendering the raw internal
-   cue key on screen — the "filename instead of subtitle" symptom.
-4. Switching the language in the menu forces the engine to reload every
-   subtitle dataset, which is why that workaround temporarily "fixes" the
-   subtitles until the next scene transition.
-
----
+Our deep dive into the game's binary revealed that during map transitions, the modified Unreal Engine localization subsystem calls FindOrLoadAltDataSet asking for .lipsync data but completely skips loading the .cue subtitle data for the new area.
 
 ## The Solution
-
-A four-layer, zero-overhead, runtime-only fix (the game executable is never
-modified). v2.1 adds two more hooks on top of v2.0 to close a residual gap
-that could still show a raw cue name at the very start of Episode 2:
-
-### 1. Native `GetSubtitleText` interceptor (`XINPUT1_3.dll`)
-- Built with **MinHook** and compiled with MSVC 2022.
-- Embeds the master dictionary of **10,475 dialogue lines** (≈64,000 aliases)
-  across all 5 episodes in native UTF-16 memory.
-- Normalizes every incoming cue name before lookup:
-  - strips the UE4 object instance suffix `_C_<number>`;
-  - handles `Play_`, `Cue_` and `Act_` prefixes;
-  - falls back to progressively shorter alias forms.
-- Any subtitle request, in any language and any scene, is resolved against the
-  complete database in real time and returned immediately, bypassing the buggy
-  engine path.
-
-### 2. `FindAltDataSetByLayerName` fallback hook
-- When the exact scene dataset is not loaded, the engine receives the first
-  loaded dataset instead of `NULL`.
-- Because every `.cue` file ships the consolidated master database, the native
-  engine lookup succeeds as a second line of defense.
-
-### 3. `SearchSubtitle` FName normalization (new in v2.1)
-- The runtime cue `FName` sometimes carries a Blueprint instance suffix
-  (`_C_<number>`) that never matches a dataset key, most visibly at the
-  start of Episode 2.
-- This hook strips that suffix before the engine's own hash-table lookup
-  runs, so the native lookup succeeds on the first try instead of falling
-  through to the buggy fallback path.
-
-### 4. Display-time text substitution (new in v2.1)
-- As a last line of defense, the exact `FName::ToString` call the subtitle
-  widget uses to turn a cue name into on-screen text is hooked too.
-- If a cue ever reaches that point unresolved, the mod substitutes the
-  correct translated line before it is drawn, so the player never sees a
-  raw cue key even in the worst case.
-
----
-
-## Installation
-
-### Automated Install (1-Click)
-1. Download or clone this repository.
-2. Run `install.bat`.
-3. Select your game directory if prompted.
-4. Launch the game normally via `LiS.exe` or Steam/Epic.
-
-### Manual Install
-1. Copy `mod_package/Binaries/Win64/XINPUT1_3.dll` to:
-   ```
-   <GameRoot>\LIS\Binaries\Win64\XINPUT1_3.dll
-   ```
-2. If a copy exists at the game root (`<GameRoot>\XINPUT1_3.dll`), replace it
-   with the same file.
-
-### Uninstall
-Delete the `XINPUT1_3.dll` files you copied. No other files are modified.
-
----
-
-## Verifying the fix
-
-After launching the game, check the log created next to the proxy DLL
-(`<GameRoot>\LIS\Binaries\Win64\LiS_SubtitleFix.log`) for:
-```
-[LiS_SubMod] DllMain ATTACH
-[DEBUG] GetSubtitleText hook created and enabled at ...
-[DEBUG] FindAltDataSetByLayerName hook created and enabled at ...
-[DEBUG] SearchSubtitle hook created and enabled at ...
-[DEBUG] FNameToString hook created and enabled at ...
-[INIT] SubtitleMap loaded: ... entries
-```
-
----
+This mod utilizes a custom XINPUT1_3.dll proxy to inject code directly into the game's memory at runtime using MinHook.
+It bypasses the flawed UE4 streaming localization cache entirely:
+1. **Universal Parsing**: At startup, it parses the raw UTF-8 .cue files from LIS/Content/AltData/ for all available languages into a fast C++ memory dictionary.
+2. **Dynamic Culture Detection**: It monitors the game's Game.ini config in real-time to know which language the user is playing in.
+3. **Memory Hijack Injection**: When the engine's GetLocalizedText fails to resolve a subtitle, the DLL intercepts it, pulls the correct translation from our dictionary, allocates a valid engine buffer (by hijacking a known massive string like the Epilepsy Warning), and injects the text perfectly.
 
 ## Building from Source
+1. Install Visual Studio (with Desktop development with C++).
+2. Open a Visual Studio Developer Command Prompt.
+3. Run uild_dll.bat inside the src folder.
 
-### Requirements
-- **Windows 10 / 11 (x64)**
-- **Visual Studio 2022** (C++ Desktop Development workload)
-
-### Build Steps
-```cmd
-cd src
-build_dll.bat
-```
-The compiled `XINPUT1_3.dll` is generated in `src/` and automatically copied to
-the game directory and `mod_package/`.
-
----
-
-## Repository Structure
-
-```
-├── install.bat             # 1-Click Batch Installer
-├── README.md               # Mod Documentation (English)
-├── src/                    # C++ Source Code
-│   ├── xinput_proxy.cpp    # Proxy DLL & MinHook Subtitle Interceptor
-│   ├── xinput.def          # Export definitions
-│   ├── subtitles_data.h    # Embedded UTF-16 subtitle dataset
-│   ├── build_dll.bat       # MSVC compiler script
-│   └── minhook/            # MinHook hooking library
-├── tools/                  # Python Reverse Engineering & Analysis Tools
-├── dist/                   # Ready-to-share community package
-│   └── LiS_Subtitle_Fix_v2.1.zip  # Flat package (DLL + install/uninstall + EN/PT-BR guides)
-└── mod_package/            # In-repo distribution package
-    ├── Binaries/Win64/
-    │   └── XINPUT1_3.dll   # Compiled mod binary
-    ├── README_EN.md        # Install guide (English)
-    ├── README_PT-BR.md     # Install guide (Português)
-    └── install.bat         # Self-contained installer
-```
-
----
-
-## License
-MIT License. Created for the *Life is Strange Remastered* modding community.
+## Installation for Players
+See the releases page for the compiled .zip file, which requires a simple copy-paste of the Binaries folder into your game's installation directory. No game files are modified or overwritten.

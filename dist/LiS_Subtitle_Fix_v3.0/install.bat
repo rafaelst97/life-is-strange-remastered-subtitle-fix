@@ -1,10 +1,10 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
 title Life is Strange Remastered - Subtitle Fix Installer
 color 0B
 
 echo =======================================================================
-echo     Life is Strange Remastered - Subtitle Fix Mod v2.0
+echo     Life is Strange Remastered - Subtitle Fix
 echo =======================================================================
 echo.
 
@@ -20,33 +20,22 @@ set /p "GAME_DIR=Enter your Life is Strange Remastered game folder: "
 :FoundGame
 if not exist "%GAME_DIR%\LIS\Binaries\Win64\LiS-Win64-Shipping.exe" (
     color 0C
-    echo [ERROR] Could not find LiS-Win64-Shipping.exe in:
-    echo "%GAME_DIR%\LIS\Binaries\Win64\"
+    echo [ERROR] LiS-Win64-Shipping.exe not found in "%GAME_DIR%\LIS\Binaries\Win64\"
     pause
     exit /b 1
 )
-
-echo [OK] Game directory detected: "%GAME_DIR%"
-echo.
-echo Installing XINPUT1_3.dll ...
 
 copy /Y "%~dp0XINPUT1_3.dll" "%GAME_DIR%\LIS\Binaries\Win64\XINPUT1_3.dll" >nul
 if %ERRORLEVEL% NEQ 0 (
     color 0C
-    echo [ERROR] Failed to copy the file. Make sure the game is closed.
+    echo [ERROR] Could not copy XINPUT1_3.dll. Close the game and try again.
     pause
     exit /b 1
 )
-echo [OK] Installed to LIS\Binaries\Win64\XINPUT1_3.dll
 
-if exist "%GAME_DIR%\XINPUT1_3.dll" (
-    copy /Y "%~dp0XINPUT1_3.dll" "%GAME_DIR%\XINPUT1_3.dll" >nul
-    echo [OK] Updated launcher-side copy at the game root.
-)
-
+echo [OK] Installed to "%GAME_DIR%\LIS\Binaries\Win64\XINPUT1_3.dll"
 echo.
-echo [SUCCESS] Subtitle Fix installed! Subtitles will no longer break after
-echo scene/episode transitions, in any language.
-echo Launch the game normally via Steam, Epic or LiS.exe.
+echo Launch the game normally. To confirm the fix is running, check
+echo XINPUT1_3.log in that same folder for "subtitle fix active".
 echo.
 pause

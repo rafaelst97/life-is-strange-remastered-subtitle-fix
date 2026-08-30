@@ -13,3 +13,4 @@ pak_staging/
 __pycache__/
 .vscode/
 .idea/
+removed_from_game_*/
