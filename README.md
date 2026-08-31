@@ -7,13 +7,13 @@ This repository contains the source code for the definitive, universal subtitle 
 ## The Problem
 In the remastered version by Deck Nine, subtitles frequently break during scene transitions or episode changes, causing the game to display raw internal keys (e.g., Act_E2_1A_...) instead of the actual localized text, or simply displaying nothing.
 
-Our deep dive into the game's binary revealed that during map transitions, the modified Unreal Engine localization subsystem calls FindOrLoadAltDataSet asking for .lipsync data but completely skips loading the .cue subtitle data for the new area.
+During map transitions, the modified Unreal Engine localization subsystem calls FindOrLoadAltDataSet asking for .lipsync data but completely skips loading the .cue subtitle data for the new area.
 
 ## The Solution
 This mod utilizes a custom XINPUT1_3.dll proxy to inject code directly into the game's memory at runtime using MinHook. It bypasses the flawed UE4 streaming localization cache entirely:
 1. **Universal Parsing**: At startup, it parses the raw UTF-8 .cue files from LIS/Content/AltData/ for all available languages into a fast C++ memory dictionary.
 2. **Dynamic Culture Detection**: It monitors the game's Game.ini config in real-time to know which language the user is playing in.
-3. **Memory Hijack Injection**: When the engine's GetLocalizedText fails to resolve a subtitle, the DLL intercepts it, pulls the correct translation from our dictionary, allocates a valid engine buffer (by hijacking a known massive string like the Epilepsy Warning), and injects the text perfectly.
+3. **Memory Hijack Injection**: When the engine's GetLocalizedText fails to resolve a subtitle, the DLL intercepts it, pulls the correct translation from the dictionary, allocates a valid engine buffer (by hijacking a known massive string like the Epilepsy Warning), and injects the text perfectly.
 
 ## Building from Source
 1. Install Visual Studio (with Desktop development with C++).
@@ -24,7 +24,7 @@ This mod utilizes a custom XINPUT1_3.dll proxy to inject code directly into the 
 **[📥 CLICK HERE TO DOWNLOAD THE COMPILED .ZIP FILE](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
 *(or visit the [Releases page](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
 
-Installation requires a simple copy-paste of the Binaries folder inside the .zip into your game's installation directory. No game files are modified or overwritten.
+Installation requires a simple copy-paste of the Binaries folder inside the .zip into the game's installation directory. No game files are modified or overwritten.
 
 <br><hr><br>
 
@@ -37,19 +37,19 @@ Este repositório contém o código-fonte para a correção definitiva e univers
 ## O Problema
 Na versão remasterizada pela Deck Nine, as legendas frequentemente quebram durante as transições de cenários ou mudanças de episódios, fazendo com que o jogo exiba identificadores internos crus (ex: Act_E2_1A_...) em vez do texto traduzido real, ou simplesmente não exiba nada.
 
-Nossa análise profunda do binário do jogo revelou que, durante as transições de mapa, o subsistema de localização modificado da Unreal Engine pede dados de .lipsync, mas pula completamente o carregamento dos dados de legenda .cue para a nova área.
+Durante as transições de mapa, o subsistema de localização modificado da Unreal Engine pede dados de .lipsync, mas pula completamente o carregamento dos dados de legenda .cue para a nova área.
 
 ## A Solução
 Este mod utiliza um proxy personalizado XINPUT1_3.dll para injetar código diretamente na memória do jogo em tempo de execução usando o MinHook. Ele contorna completamente o cache de localização quebrado:
 1. **Análise Universal**: Na inicialização, ele faz o parsing dos arquivos .cue originais em UTF-8 de LIS/Content/AltData/ para todos os idiomas em um dicionário rápido em C++.
 2. **Detecção Dinâmica**: Monitora as configurações do Game.ini em tempo real para saber em qual idioma o usuário está jogando.
-3. **Injeção Dinâmica**: Quando a engine falha, a DLL intercepta, puxa a tradução do nosso dicionário, aloca um buffer válido da engine (sequestrando uma string gigante como o Aviso de Epilepsia) e injeta o texto na tela.
+3. **Injeção Dinâmica**: Quando a engine falha, a DLL intercepta, puxa a tradução do dicionário, aloca um buffer válido da engine (sequestrando uma string gigante como o Aviso de Epilepsia) e injeta o texto na tela.
 
 ## Instalação para Jogadores
 **[📥 CLIQUE AQUI PARA BAIXAR O MOD (ARQUIVO .ZIP)](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
 *(ou visite a [página de Releases](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
 
-A instalação requer apenas copiar a pasta Binaries que está dentro do .zip para o diretório do seu jogo.
+A instalação requer apenas copiar a pasta Binaries que está dentro do .zip para o diretório do jogo.
 
 <br><hr><br>
 
@@ -65,7 +65,7 @@ La solución utiliza XINPUT1_3.dll (vía MinHook) para leer directamente los tex
 **[📥 HAGA CLIC AQUÍ PARA DESCARGAR EL ARCHIVO .ZIP](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
 *(o visite la [página de Lanzamientos](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
 
-Solo necesita copiar la carpeta Binaries que está dentro del .zip al directorio de su juego.
+Basta con copiar la carpeta Binaries que está dentro del .zip al directorio del juego.
 
 <br><hr><br>
 
@@ -81,7 +81,7 @@ La solution utilise XINPUT1_3.dll (via MinHook) pour lire directement les textes
 **[📥 CLIQUEZ ICI POUR TÉLÉCHARGER LE FICHIER .ZIP](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
 *(ou visitez la [page des Versions](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
 
-Il vous suffit de copier le dossier Binaries présent dans le .zip vers le répertoire de votre jeu.
+Il suffit de copier le dossier Binaries présent dans le .zip vers le répertoire du jeu.
 
 <br><hr><br>
 
@@ -97,7 +97,7 @@ Die Lösung verwendet XINPUT1_3.dll (via MinHook), um Texte direkt aus den Origi
 **[📥 KLICKEN SIE HIER, UM DIE .ZIP-DATEI HERUNTERZULADEN](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
 *(oder besuchen Sie die [Releases-Seite](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
 
-Sie müssen lediglich den Ordner Binaries aus der .zip-Datei in Ihr Spielverzeichnis kopieren.
+Es ist lediglich erforderlich, den Ordner Binaries aus der .zip-Datei in das Spielverzeichnis zu kopieren.
 
 <br><hr><br>
 
@@ -129,7 +129,7 @@ Basta copiare la cartella Binaries contenuta nel .zip nella directory del gioco.
 **[📥 НАЖМИТЕ ЗДЕСЬ, ЧТОБЫ СКАЧАТЬ ФАЙЛ .ZIP](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
 *(или посетите [страницу Релизов](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
 
-Вам просто нужно скопировать папку Binaries из .zip в каталог вашей игры.
+Достаточно скопировать папку Binaries из .zip в каталог игры.
 
 <br><hr><br>
 
@@ -145,7 +145,7 @@ Basta copiare la cartella Binaries contenuta nel .zip nella directory del gioco.
 **[📥 点击此处下载编译好的 .ZIP 文件](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
 *(或访问 [发布页面](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/latest))*
 
-只需将 .zip 文件中的 Binaries 文件夹复制到您的游戏目录即可。
+只需将 .zip 文件中的 Binaries 文件夹复制到游戏目录即可。
 
 <br><hr><br>
 
