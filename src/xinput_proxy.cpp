@@ -406,10 +406,7 @@ DWORD WINAPI SubtitleModThread(LPVOID lpParam) {
     // Wait for the game to unpack itself
     Sleep(2000);
 
-    if (MH_Initialize() != MH_OK) {
-        LogLine("[INIT] MinHook failed to initialize");
-        return 1;
-    }
+    if (MH_Initialize() != MH_OK) { return 1; }
     
     LoadAllAltData();
     
@@ -440,11 +437,9 @@ DWORD WINAPI SubtitleModThread(LPVOID lpParam) {
     if (memcmp((void*)gltAddr, kGetLocalizedTextPrologue, sizeof(kGetLocalizedTextPrologue)) == 0) {
         if (MH_CreateHook((void*)gltAddr, &hook_GetLocalizedText, (LPVOID*)&orig_GetLocalizedText) == MH_OK) {
             MH_EnableHook((void*)gltAddr);
-            LogLine("[INIT] GetLocalizedText hooked at 0x%zx", gltAddr);
-        }
+                    }
     } else {
-        LogLine("[INIT] GetLocalizedText prologue mismatch, aborting hook");
-    }
+            }
 
     uintptr_t wcsicmpAddr = base + kWcsicmpRVA;
     if (memcmp((void*)wcsicmpAddr, kWcsicmpPrologue, sizeof(kWcsicmpPrologue)) == 0) {
@@ -485,3 +480,4 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID) {
     }
     return TRUE;
 }
+
