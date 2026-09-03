@@ -131,28 +131,13 @@ extern "C" {
 // Diagnostics. Written next to this DLL, UTF-8, capped so a long session can
 // never grow the file without bound.
 // ---------------------------------------------------------------------------
-static char g_LogPath[MAX_PATH] = { 0 };
-static LONG g_LogLines = 0;
+
+
 
 static void InitLogPath(HMODULE hModule) {
-    wchar_t modulePath[MAX_PATH] = { 0 };
-    if (GetModuleFileNameW(hModule, modulePath, MAX_PATH) == 0) return;
-    wchar_t* dot = wcsrchr(modulePath, L'.');
-    if (dot) wcscpy_s(dot, MAX_PATH - (size_t)(dot - modulePath), L".log");
-    WideCharToMultiByte(CP_UTF8, 0, modulePath, -1, g_LogPath, MAX_PATH, NULL, NULL);
 }
 
 static void LogLine(const char* fmt, ...) {
-    if (g_LogPath[0] == '\0') return;
-    if (InterlockedIncrement(&g_LogLines) > 3000) return;
-    FILE* f = NULL;
-    if (fopen_s(&f, g_LogPath, "a") != 0 || !f) return;
-    va_list args;
-    va_start(args, fmt);
-    vfprintf(f, fmt, args);
-    va_end(args);
-    fputc('\n', f);
-    fclose(f);
 }
 
 // UTF-8 rendering of a wide string, for the log only.
