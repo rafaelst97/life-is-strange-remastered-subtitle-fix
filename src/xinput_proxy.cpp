@@ -310,8 +310,22 @@ void LoadFanTranslations() {
     if (hFind == INVALID_HANDLE_VALUE) return;
     
     do {
+        std::wstring wname = ffd.cFileName;
+        if (wname.find(L"pakchunk") == 0 && wname.find(L"-WindowsNoEditor.pak") != std::wstring::npos) {
+            size_t start = 8;
+            size_t end = wname.find(L"-WindowsNoEditor.pak");
+            bool only_digits = true;
+            for (size_t i = start; i < end; ++i) {
+                if (wname[i] < L'0' || wname[i] > L'9') {
+                    only_digits = false;
+                    break;
+                }
+            }
+            if (only_digits) continue; // Skip official game paks
+        }
+
         std::wstring path = L"C:\\Games\\Life is Strange Remastered\\LIS\\Content\\Paks\\";
-        path += ffd.cFileName;
+        path += wname;
         
         FILE* f = _wfopen(path.c_str(), L"rb");
         if (!f) continue;
