@@ -237,6 +237,8 @@ static t_GetLocalizedText orig_GetLocalizedText = NULL;
 #include <vector>
 
 std::unordered_map<std::wstring, std::unordered_map<std::wstring, std::wstring>> g_AltDataDicts;
+bool g_HasFanTranslation = false;
+std::wstring g_FanTranslationLang = L"";
 
 std::wstring Utf8ToWString(const std::string& str) {
     if (str.empty()) return std::wstring();
@@ -288,6 +290,8 @@ void ParseIniContent(const std::string& lang, const std::string& content) {
             g_AltDataDicts[wlang][Utf8ToWString(key)] = Utf8ToWString(val);
         }
     }
+    g_HasFanTranslation = true;
+    g_FanTranslationLang = wlang;
 }
 
 #pragma pack(push, 1)
@@ -386,13 +390,14 @@ void LoadFanTranslations() {
                 offset += 5;
             }
             
-            if (name.find("CU_") != std::string::npos && name.find(".ini") != std::string::npos) {
+            std::string full_name = mount_point + name;
+            if (full_name.find("CU_") != std::string::npos && full_name.find(".ini") != std::string::npos) {
                 std::string lang = "en";
-                size_t loc_pos = name.find("Localization/");
+                size_t loc_pos = full_name.find("Localization/");
                 if (loc_pos != std::string::npos) {
-                    size_t slash = name.find('/', loc_pos + 13);
+                    size_t slash = full_name.find('/', loc_pos + 13);
                     if (slash != std::string::npos) {
-                        lang = name.substr(loc_pos + 13, slash - (loc_pos + 13));
+                        lang = full_name.substr(loc_pos + 13, slash - (loc_pos + 13));
                     }
                 }
                 
@@ -539,6 +544,9 @@ bool __fastcall hook_GetLocalizedText(const wchar_t* key, void* outText) {
     }
 
     std::wstring current_lang = GetCurrentCultureSuffix();
+    if (g_HasFanTranslation) {
+        current_lang = g_FanTranslationLang;
+    }
     auto& dict = g_AltDataDicts[current_lang];
     auto it = dict.find(normalized);
     if (it != dict.end()) {
