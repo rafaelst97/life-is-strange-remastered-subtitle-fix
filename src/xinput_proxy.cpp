@@ -292,6 +292,7 @@ void ParseIniContent(const std::string& lang, const std::string& content) {
     }
     g_HasFanTranslation = true;
     g_FanTranslationLang = wlang;
+    LogLine("[FAN] Parsed fan translation for lang: %ls, total entries: %zu", wlang.c_str(), g_AltDataDicts[wlang].size());
 }
 
 #pragma pack(push, 1)
@@ -416,31 +417,34 @@ void LoadFanTranslations() {
                 }
                 
                 long long saved_pos = _ftelli64(f);
-                _fseeki64(f, entry_offset, SEEK_SET);
                 
-                std::vector<uint8_t> head(300);
-                fread(head.data(), 1, 300, f);
-                int start_idx = -1;
-                for (int h = 0; h < 300; h++) {
-                    if (head[h] == '[') { start_idx = h; break; }
+                int header_size = 48;
+                if (info.Version >= 3) {
+                    if (comp_method != 0) {
+                        uint32_t blocks = 0;
+                        _fseeki64(f, entry_offset + 48, SEEK_SET);
+                        fread(&blocks, 1, 4, f);
+                        header_size += 4 + (blocks * 16);
+                    }
+                    header_size += 5;
                 }
                 
-                if (start_idx != -1) {
-                    _fseeki64(f, entry_offset + start_idx, SEEK_SET);
+                _fseeki64(f, entry_offset + header_size, SEEK_SET);
+                
+                if (comp_method == 0) {
+                    std::string data(uncomp_size, 0);
+                    fread(&data[0], 1, uncomp_size, f);
+                    ParseIniContent(lang, data);
+                } else if (comp_method == 1) {
+                    std::vector<uint8_t> comp_data(entry_size);
+                    fread(comp_data.data(), 1, entry_size, f);
                     
-                    if (comp_method == 0) {
-                        std::string data(uncomp_size, 0);
-                        fread(&data[0], 1, uncomp_size, f);
-                        ParseIniContent(lang, data);
-                    } else if (comp_method == 1) {
-                        std::vector<uint8_t> comp_data(entry_size - start_idx);
-                        fread(comp_data.data(), 1, comp_data.size(), f);
-                        
-                        std::string uncomp_data(uncomp_size, 0);
-                        mz_ulong dest_len = (mz_ulong)uncomp_size;
-                        if (mz_uncompress((unsigned char*)&uncomp_data[0], &dest_len, comp_data.data(), (mz_ulong)comp_data.size()) == MZ_OK) {
-                            ParseIniContent(lang, uncomp_data);
-                        }
+                    std::string uncomp_data(uncomp_size, 0);
+                    mz_ulong dest_len = (mz_ulong)uncomp_size;
+                    if (mz_uncompress((unsigned char*)&uncomp_data[0], &dest_len, comp_data.data(), (mz_ulong)comp_data.size()) == MZ_OK) {
+                        ParseIniContent(lang, uncomp_data);
+                    } else {
+                        LogLine("[FAN] Failed to decompress %s (comp: %llu, uncomp: %llu)", full_name.c_str(), entry_size, uncomp_size);
                     }
                 }
                 _fseeki64(f, saved_pos, SEEK_SET);
@@ -450,6 +454,7 @@ void LoadFanTranslations() {
         fclose(f);
     } while (FindNextFileW(hFind, &ffd) != 0);
     FindClose(hFind);
+    LogLine("[FAN] Finished scanning paks. HasFanTranslation=%d, Lang=%ls", g_HasFanTranslation, g_FanTranslationLang.c_str());
 }
 
 void LoadAllAltData() {
@@ -558,9 +563,12 @@ bool __fastcall hook_GetLocalizedText(const wchar_t* key, void* outText) {
     }
 
     std::wstring current_lang = GetCurrentCultureSuffix();
+    std::wstring original_lang = current_lang;
     if (g_HasFanTranslation) {
         current_lang = g_FanTranslationLang;
     }
+    // Only log once per frame or so to avoid spamming, but for debugging just log every miss
+    // LogLine("[HOOK] Fallback triggered. Original lang: %ls, Using lang: %ls", original_lang.c_str(), current_lang.c_str());
     auto& dict = g_AltDataDicts[current_lang];
     auto it = dict.find(normalized);
     if (it != dict.end()) {
