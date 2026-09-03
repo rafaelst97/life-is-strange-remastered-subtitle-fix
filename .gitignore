@@ -14,3 +14,5 @@ __pycache__/
 .vscode/
 .idea/
 removed_from_game_*/
+
+debug-traducoes/
