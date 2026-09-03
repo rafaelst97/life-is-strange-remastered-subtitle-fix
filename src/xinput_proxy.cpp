@@ -24,6 +24,7 @@
 #include <string>
 #include "minhook/include/MinHook.h"
 #include "subtitle_lookup.h"
+#include "miniz.h"
 
 #pragma comment(lib, "user32.lib")
 
@@ -237,6 +238,201 @@ static t_GetLocalizedText orig_GetLocalizedText = NULL;
 
 std::unordered_map<std::wstring, std::unordered_map<std::wstring, std::wstring>> g_AltDataDicts;
 
+std::wstring Utf8ToWString(const std::string& str) {
+    if (str.empty()) return std::wstring();
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+    std::wstring wstrTo(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+    return wstrTo;
+}
+
+void ParseIniContent(const std::string& lang, const std::string& content) {
+    std::wstring wlang = Utf8ToWString(lang);
+    if (wlang == L"en") wlang = L"INT";
+    else if (wlang == L"pt-BR" || wlang == L"pt" || wlang == L"POR") wlang = L"PTB";
+    else if (wlang == L"fr") wlang = L"FRA";
+    else if (wlang == L"it") wlang = L"ITA";
+    else if (wlang == L"de") wlang = L"DEU";
+    else if (wlang == L"es-M" || wlang == L"es-4") wlang = L"ESM";
+    else if (wlang == L"es") wlang = L"ESN";
+    else if (wlang == L"ja") wlang = L"JPN";
+    else if (wlang == L"hu") wlang = L"HUN";
+    else if (wlang == L"ru") wlang = L"RUS";
+    else if (wlang == L"zh-Hans") wlang = L"ZHS";
+    else if (wlang == L"zh-Hant") wlang = L"ZHT";
+
+    size_t pos = 0;
+    while (pos < content.size()) {
+        size_t eol = content.find('\n', pos);
+        if (eol == std::string::npos) eol = content.size();
+        
+        std::string line = content.substr(pos, eol - pos);
+        pos = eol + 1;
+        
+        if (!line.empty() && line.back() == '\r') line.pop_back();
+        
+        size_t eq = line.find('=');
+        if (eq != std::string::npos) {
+            std::string key = line.substr(0, eq);
+            std::string val = line.substr(eq + 1);
+            if (val.length() >= 2 && val.front() == '"' && val.back() == '"') {
+                val = val.substr(1, val.length() - 2);
+            }
+            
+            size_t esc = 0;
+            while ((esc = val.find("\\\"")) != std::string::npos) {
+                val.replace(esc, 2, "\"");
+                esc += 1;
+            }
+
+            g_AltDataDicts[wlang][Utf8ToWString(key)] = Utf8ToWString(val);
+        }
+    }
+}
+
+#pragma pack(push, 1)
+struct FPakInfo {
+    uint32_t Magic;
+    uint32_t Version;
+    uint64_t IndexOffset;
+    uint64_t IndexSize;
+    uint8_t IndexHash[20];
+};
+#pragma pack(pop)
+
+void LoadFanTranslations() {
+    WIN32_FIND_DATAW ffd;
+    HANDLE hFind = FindFirstFileW(L"C:\\Games\\Life is Strange Remastered\\LIS\\Content\\Paks\\*.pak", &ffd);
+    if (hFind == INVALID_HANDLE_VALUE) return;
+    
+    do {
+        std::wstring path = L"C:\\Games\\Life is Strange Remastered\\LIS\\Content\\Paks\\";
+        path += ffd.cFileName;
+        
+        FILE* f = _wfopen(path.c_str(), L"rb");
+        if (!f) continue;
+        
+        _fseeki64(f, 0, SEEK_END);
+        long long size = _ftelli64(f);
+        if (size < 256) { fclose(f); continue; }
+        
+        _fseeki64(f, size - 256, SEEK_SET);
+        std::vector<uint8_t> tail(256);
+        fread(tail.data(), 1, 256, f);
+        
+        int magic_idx = -1;
+        for (int i = 0; i < 256 - 24; i++) {
+            if (tail[i] == 0xE1 && tail[i+1] == 0x12 && tail[i+2] == 0x6F && tail[i+3] == 0x5A) {
+                magic_idx = i;
+                break;
+            }
+        }
+        
+        if (magic_idx == -1) { fclose(f); continue; }
+        
+        FPakInfo info;
+        memcpy(&info, &tail[magic_idx], sizeof(FPakInfo));
+        
+        _fseeki64(f, info.IndexOffset, SEEK_SET);
+        std::vector<uint8_t> idx_data(info.IndexSize);
+        fread(idx_data.data(), 1, info.IndexSize, f);
+        
+        size_t offset = 0;
+        
+        auto ReadString = [&](std::string& out) {
+            if (offset + 4 > idx_data.size()) return false;
+            int32_t len = *(int32_t*)&idx_data[offset];
+            offset += 4;
+            if (len > 0) {
+                if (offset + len > idx_data.size()) return false;
+                out.assign((char*)&idx_data[offset], len - 1);
+                offset += len;
+            } else if (len < 0) {
+                int32_t wlen = -len;
+                if (offset + wlen * 2 > idx_data.size()) return false;
+                out.clear();
+                for (int i=0; i<wlen-1; i++) out += (char)idx_data[offset + i*2];
+                offset += wlen * 2;
+            } else {
+                out = "";
+            }
+            return true;
+        };
+        
+        std::string mount_point;
+        ReadString(mount_point);
+        
+        if (offset + 4 > idx_data.size()) { fclose(f); continue; }
+        int32_t num_entries = *(int32_t*)&idx_data[offset];
+        offset += 4;
+        
+        for (int i = 0; i < num_entries; i++) {
+            std::string name;
+            if (!ReadString(name)) break;
+            
+            if (offset + 28 > idx_data.size()) break;
+            uint64_t entry_offset = *(uint64_t*)&idx_data[offset];
+            uint64_t entry_size = *(uint64_t*)&idx_data[offset + 8];
+            uint64_t uncomp_size = *(uint64_t*)&idx_data[offset + 16];
+            uint32_t comp_method = *(uint32_t*)&idx_data[offset + 24];
+            offset += 28 + 20; 
+            
+            if (info.Version >= 3) {
+                if (comp_method != 0) {
+                    if (offset + 4 > idx_data.size()) break;
+                    uint32_t num_blocks = *(uint32_t*)&idx_data[offset];
+                    offset += 4 + num_blocks * 16;
+                }
+                offset += 5;
+            }
+            
+            if (name.find("CU_") != std::string::npos && name.find(".ini") != std::string::npos) {
+                std::string lang = "en";
+                size_t loc_pos = name.find("Localization/");
+                if (loc_pos != std::string::npos) {
+                    size_t slash = name.find('/', loc_pos + 13);
+                    if (slash != std::string::npos) {
+                        lang = name.substr(loc_pos + 13, slash - (loc_pos + 13));
+                    }
+                }
+                
+                long long saved_pos = _ftelli64(f);
+                _fseeki64(f, entry_offset, SEEK_SET);
+                
+                std::vector<uint8_t> head(300);
+                fread(head.data(), 1, 300, f);
+                int start_idx = -1;
+                for (int h = 0; h < 300; h++) {
+                    if (head[h] == '[') { start_idx = h; break; }
+                }
+                
+                if (start_idx != -1) {
+                    _fseeki64(f, entry_offset + start_idx, SEEK_SET);
+                    
+                    if (comp_method == 0) {
+                        std::string data(uncomp_size, 0);
+                        fread(&data[0], 1, uncomp_size, f);
+                        ParseIniContent(lang, data);
+                    } else if (comp_method == 1) {
+                        std::vector<uint8_t> comp_data(entry_size - start_idx);
+                        fread(comp_data.data(), 1, comp_data.size(), f);
+                        
+                        std::string uncomp_data(uncomp_size, 0);
+                        mz_ulong dest_len = (mz_ulong)uncomp_size;
+                        if (mz_uncompress((unsigned char*)&uncomp_data[0], &dest_len, comp_data.data(), (mz_ulong)comp_data.size()) == MZ_OK) {
+                            ParseIniContent(lang, uncomp_data);
+                        }
+                    }
+                }
+                _fseeki64(f, saved_pos, SEEK_SET);
+            }
+        }
+        
+        fclose(f);
+    } while (FindNextFileW(hFind, &ffd) != 0);
+    FindClose(hFind);
+}
+
 void LoadAllAltData() {
     WIN32_FIND_DATAW ffd;
     HANDLE hFind = FindFirstFileW(L"C:\\Games\\Life is Strange Remastered\\LIS\\Content\\AltData\\*.cue", &ffd);
@@ -299,6 +495,7 @@ void LoadAllAltData() {
     int total = 0;
     for (auto& pair : g_AltDataDicts) total += pair.second.size();
     LogLine("[INIT] Loaded %d total subtitle lines across %zu languages", total, g_AltDataDicts.size());
+    LoadFanTranslations();
 }
 
 std::wstring GetCurrentCultureSuffix() {
