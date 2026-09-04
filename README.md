@@ -18,7 +18,7 @@ This mod utilizes a custom XINPUT1_3.dll proxy to inject code directly into the 
 ## Building from Source
 1. Install Visual Studio (with Desktop development with C++).
 2. Open a Visual Studio Developer Command Prompt.
-3. Run uild_dll.bat inside the src folder.
+3. Run build_dll.bat inside the src folder.
 
 ## Installation for Players
 **[📥 CLICK HERE TO DOWNLOAD THE COMPILED .ZIP FILE](https://github.com/rafaelst97/life-is-strange-remastered-subtitle-fix/releases/download/v2.0/LiS_Remastered_Universal_Subtitle_Fix_v2.0.zip)** 
